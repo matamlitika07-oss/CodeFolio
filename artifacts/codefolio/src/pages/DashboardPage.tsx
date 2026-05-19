@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, Link } from "wouter";
 import { 
   useGetMe, 
@@ -262,91 +262,133 @@ function ProfileForm({ user, setLocalData, updateProfile }: any) {
 
 function ProjectsForm({ user, setLocalData, updateProjects }: any) {
   const [projects, setProjects] = useState<any[]>(user.projects || []);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // null = form closed, undefined = adding new, string = editing existing id
+  const [editingId, setEditingId] = useState<string | undefined | null>(null);
 
-  const saveToApi = (newProjects: any[]) => {
+  // Re-sync local list if the server data changes (e.g. page revisit)
+  useEffect(() => {
+    setProjects(user.projects || []);
+  }, [user]);
+
+  const saveToApi = useCallback((newProjects: any[]) => {
     setLocalData((prev: any) => ({ ...prev, projects: newProjects }));
     updateProjects.mutate({ data: { projects: newProjects } });
-  };
+  }, [setLocalData, updateProjects]);
 
   const deleteProject = (id: string) => {
-    const newProjects = projects.filter(p => p.id !== id);
-    setProjects(newProjects);
-    saveToApi(newProjects);
+    const updated = projects.filter(p => p.id !== id);
+    setProjects(updated);
+    saveToApi(updated);
   };
 
   const handleProjectSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const techStackStr = formData.get("techStack") as string;
-    
+
     const projectData = {
-      id: editingId || Math.random().toString(36).substring(7),
+      // When editingId is a real id, keep it; otherwise generate a new one
+      id: (editingId && editingId !== undefined) ? editingId : Math.random().toString(36).substring(7),
       title: formData.get("title") as string,
       description: formData.get("description") as string,
-      techStack: techStackStr.split(",").map(s => s.trim()).filter(Boolean),
+      techStack: techStackStr.split(",").map((s: string) => s.trim()).filter(Boolean),
       repoLink: formData.get("repoLink") as string,
       liveLink: formData.get("liveLink") as string,
       screenshotUrl: formData.get("screenshotUrl") as string,
     };
 
-    let newProjects;
-    if (editingId) {
-      newProjects = projects.map(p => p.id === editingId ? projectData : p);
+    let updated: any[];
+    if (typeof editingId === "string") {
+      // Editing an existing project — replace it
+      updated = projects.map(p => p.id === editingId ? projectData : p);
     } else {
-      newProjects = [...projects, projectData];
+      // Adding a new project — append it
+      updated = [...projects, projectData];
     }
 
-    setProjects(newProjects);
-    saveToApi(newProjects);
+    setProjects(updated);
+    saveToApi(updated);
     setEditingId(null);
-    (e.target as HTMLFormElement).reset();
   };
 
-  const editProject = (p: any) => {
-    setEditingId(p.id);
-  };
+  const editingProject = typeof editingId === "string"
+    ? projects.find(p => p.id === editingId)
+    : null;
+
+  const showForm = editingId !== null; // null = hidden, undefined = new, string = edit
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Projects</h2>
-        {editingId === null && (
-          <Button size="sm" onClick={() => setEditingId('new')} className="bg-white text-black hover:bg-gray-200">
+        {!showForm && (
+          <Button size="sm" onClick={() => setEditingId(undefined)} className="bg-white text-black hover:bg-gray-200">
             <Plus size={16} className="mr-2" /> Add Project
           </Button>
         )}
       </div>
 
-      {editingId && (
+      {showForm && (
         <Card className="bg-black/60 border-white/20 text-white mb-8">
           <CardContent className="pt-6">
-            <form onSubmit={handleProjectSubmit} className="space-y-4">
+            {/* key forces a full re-mount when switching between add and different edits */}
+            <form key={String(editingId)} onSubmit={handleProjectSubmit} className="space-y-4">
+              <p className="text-sm text-gray-400 font-medium">
+                {editingProject ? `Editing: ${editingProject.title}` : "New Project"}
+              </p>
               <div className="space-y-2">
-                <Label>Title</Label>
-                <Input name="title" defaultValue={editingId !== 'new' ? projects.find(p=>p.id===editingId)?.title : ""} required className="bg-black/40 border-white/10" />
+                <Label>Title *</Label>
+                <Input
+                  name="title"
+                  defaultValue={editingProject?.title ?? ""}
+                  required
+                  placeholder="My Awesome Project"
+                  className="bg-black/40 border-white/10"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Description</Label>
-                <Textarea name="description" defaultValue={editingId !== 'new' ? projects.find(p=>p.id===editingId)?.description : ""} className="bg-black/40 border-white/10" />
+                <Textarea
+                  name="description"
+                  defaultValue={editingProject?.description ?? ""}
+                  placeholder="What does this project do?"
+                  className="bg-black/40 border-white/10"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Tech Stack (comma-separated)</Label>
-                <Input name="techStack" defaultValue={editingId !== 'new' ? projects.find(p=>p.id===editingId)?.techStack?.join(", ") : ""} className="bg-black/40 border-white/10" />
+                <Input
+                  name="techStack"
+                  defaultValue={editingProject?.techStack?.join(", ") ?? ""}
+                  placeholder="React, Node.js, PostgreSQL"
+                  className="bg-black/40 border-white/10"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Repo Link</Label>
-                  <Input name="repoLink" defaultValue={editingId !== 'new' ? projects.find(p=>p.id===editingId)?.repoLink : ""} className="bg-black/40 border-white/10" />
+                  <Input
+                    name="repoLink"
+                    defaultValue={editingProject?.repoLink ?? ""}
+                    placeholder="https://github.com/..."
+                    className="bg-black/40 border-white/10"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Live Link</Label>
-                  <Input name="liveLink" defaultValue={editingId !== 'new' ? projects.find(p=>p.id===editingId)?.liveLink : ""} className="bg-black/40 border-white/10" />
+                  <Input
+                    name="liveLink"
+                    defaultValue={editingProject?.liveLink ?? ""}
+                    placeholder="https://myapp.com"
+                    className="bg-black/40 border-white/10"
+                  />
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-4 border-t border-white/10 mt-4">
                 <Button type="button" variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
-                <Button type="submit" className="bg-white text-black hover:bg-gray-200">Save Project</Button>
+                <Button type="submit" className="bg-white text-black hover:bg-gray-200">
+                  {editingProject ? "Update Project" : "Add Project"}
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -356,28 +398,38 @@ function ProjectsForm({ user, setLocalData, updateProjects }: any) {
       <div className="space-y-4">
         {projects.map(p => (
           <div key={p.id} className="bg-white/5 border border-white/10 p-4 rounded-lg flex justify-between items-start">
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-lg">{p.title}</h3>
-              <p className="text-gray-400 text-sm mt-1">{p.description}</p>
-              <div className="flex gap-2 mt-3">
+              <p className="text-gray-400 text-sm mt-1 line-clamp-2">{p.description}</p>
+              <div className="flex flex-wrap gap-2 mt-3">
                 {p.techStack?.map((t: string) => (
                   <span key={t} className="text-xs bg-white/10 px-2 py-1 rounded">{t}</span>
                 ))}
               </div>
             </div>
             <div className="flex gap-2 shrink-0 ml-4">
-              <Button size="icon" variant="ghost" onClick={() => editProject(p)} className="h-8 w-8 text-gray-400 hover:text-white">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setEditingId(p.id)}
+                className="h-8 w-8 text-gray-400 hover:text-white"
+              >
                 <Edit2 size={16} />
               </Button>
-              <Button size="icon" variant="ghost" onClick={() => deleteProject(p.id)} className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-400/10">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => deleteProject(p.id)}
+                className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-400/10"
+              >
                 <Trash2 size={16} />
               </Button>
             </div>
           </div>
         ))}
-        {projects.length === 0 && !editingId && (
+        {projects.length === 0 && !showForm && (
           <div className="text-center py-12 text-gray-500 border border-dashed border-white/10 rounded-lg">
-            No projects added yet.
+            No projects added yet. Click "Add Project" to get started.
           </div>
         )}
       </div>

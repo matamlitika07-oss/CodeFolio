@@ -1,0 +1,111 @@
+Fix the project form submission bug in CodeFolio. The projects tab in the dashboard is not saving project data correctly. Apply all the following fixes:
+
+## FIX 1: ProjectForm.jsx
+Replace the entire ProjectForm component with this correct implementation:
+
+- Use React Hook Form's useForm() with defaultValues for all fields:
+  { title: '', description: '', techStack: '', repoLink: '', liveLink: '', screenshotUrl: '' }
+- techStack field is a plain text input (comma-separated string) NOT an array input
+- On submit, convert techStack string to array: techStack.split(',').map(s => s.trim()).filter(Boolean)
+- The onSubmit callback receives the cleaned project object and calls the parent's onAddProject(projectData)
+- After successful submit, call reset() to clear the form
+- All fields use register() from useForm — do NOT use Controller or custom inputs
+- Form fields: Title (required), Description (textarea, required), Tech Stack (text input, placeholder: "React, Node.js, MongoDB"), Repo Link (text), Live Link (text), Screenshot URL (text)
+- Show validation error messages below each required field using formState.errors
+
+## FIX 2: DashboardPage.jsx — Projects Tab
+Fix the projects state management:
+
+- Keep a local projects state: const [projects, setProjects] = useState([])
+- On component mount (useEffect), fetch GET /api/portfolio/me and setProjects(data.projects || [])
+- onAddProject function:
+  const onAddProject = async (newProject) => {
+    const updated = [...projects, newProject];
+    setProjects(updated);
+    await api('/portfolio/projects', {
+      method: 'PUT',
+      body: JSON.stringify({ projects: updated })
+    }, token);
+  }
+- onDeleteProject function:
+  const onDeleteProject = async (index) => {
+    const updated = projects.filter((_, i) => i !== index);
+    setProjects(updated);
+    await api('/portfolio/projects', {
+      method: 'PUT',
+      body: JSON.stringify({ projects: updated })
+    }, token);
+  }
+- Pass onAddProject to <ProjectForm onAddProject={onAddProject} />
+- Render existing projects as cards above the form, each with a Delete button calling onDeleteProject(index)
+- Show project title, description, and techStack chips on each card
+
+## FIX 3: server/routes/portfolio.js — PUT /projects route
+Make sure the route correctly handles the request:
+
+router.put('/projects', authMiddleware, async (req, res) => {
+  try {
+    const { projects } = req.body;
+    if (!Array.isArray(projects)) {
+      return res.status(400).json({ message: 'Projects must be an array' });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { $set: { projects: projects } },
+      { new: true, runValidators: true }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ success: true, projects: user.projects });
+  } catch (err) {
+    console.error('Projects update error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+## FIX 4: server/models/User.js — Projects Schema
+Make sure the projects array schema has no required fields blocking saves:
+
+projects: [{
+  title: { type: String, default: '' },
+  description: { type: String, default: '' },
+  techStack: { type: [String], default: [] },
+  repoLink: { type: String, default: '' },
+  liveLink: { type: String, default: '' },
+  screenshotUrl: { type: String, default: '' }
+}]
+
+## FIX 5: api.js helper
+Make sure the shared API helper correctly stringifies and sets headers:
+
+const api = async (endpoint, options = {}, token = null) => {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await fetch('/api' + endpoint, {
+    ...options,
+    headers: { ...headers, ...(options.headers || {}) }
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'API error');
+  return data;
+};
+export default api;
+
+## FIX 6: Vite proxy config (client/vite.config.js)
+Make sure API calls from React reach the Express server:
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
+  }
+})
+
+Apply all 6 fixes completely. Do not skip any. After applying, the full project add flow should work: user fills form → clicks Add Project → project appears in list above form → data is saved to MongoDB → LivePreview on the right updates to show the new project.
