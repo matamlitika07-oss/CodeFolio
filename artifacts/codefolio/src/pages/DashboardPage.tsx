@@ -835,12 +835,14 @@ function SkillsForm({ user, setLocalData, updateSkills }: any) {
 
 function ThemeSelector({ currentTemplate, setLocalData, updateTemplate, toast }: any) {
   const themes = [
-    { id: "minimalist", name: "Minimalist", domain: "Frontend", desc: "Clean typography, lots of whitespace" },
-    { id: "cyberpunk", name: "Cyberpunk", domain: "Web3 / Hacker", desc: "Neon green on black, scanlines" },
-    { id: "corporate", name: "Corporate", domain: "Enterprise", desc: "Professional, trusted, bold" },
-    { id: "creative", name: "Creative", domain: "UI / UX Design", desc: "Animated gradients, expressive" },
-    { id: "data-science", name: "Data Science", domain: "ML / AI", desc: "Notebook vibes, data-dense" },
-    { id: "game-dev", name: "Game Dev", domain: "Indie / GameDev", desc: "8-bit retro pixel style" },
+    { id: "minimalist", name: "Frontend Engineer", domain: "Frontend / Web", desc: "Dark glass + purple gradient hero, modern dev aesthetic", emoji: "⚡" },
+    { id: "corporate", name: "Backend Engineer", domain: "Backend / Systems", desc: "Structured enterprise look, clean white dashboard", emoji: "🏗️" },
+    { id: "data-science", name: "AI / ML Engineer", domain: "AI & Data Science", desc: "Terminal-style notebook, metrics & glowing data", emoji: "🤖" },
+    { id: "cyberpunk", name: "Cybersecurity", domain: "Security / Hacking", desc: "Matrix green, scanlines, hacker terminal vibes", emoji: "🔐" },
+    { id: "devops", name: "DevOps / Cloud", domain: "Infrastructure", desc: "CI/CD pipeline, orange accent, infra dashboard", emoji: "☁️" },
+    { id: "creative", name: "UI / UX Designer", domain: "Design / Creative", desc: "Pastel bento grid, Dribbble-inspired showcase", emoji: "🎨" },
+    { id: "student", name: "Student / Placement", domain: "Freshers & Campus", desc: "ATS-friendly, clean blue, stats cards & certs", emoji: "🎓" },
+    { id: "game-dev", name: "Game Developer", domain: "Indie / GameDev", desc: "8-bit pixel retro style, vibrant game aesthetic", emoji: "🎮" },
   ];
 
   const selectTheme = (id: string) => {
@@ -873,26 +875,19 @@ function ThemeSelector({ currentTemplate, setLocalData, updateTemplate, toast }:
                 transition: "all 0.2s",
               }}
             >
-              <div className="flex justify-between items-center mb-1">
-                <h3 className="font-bold text-white text-sm">{t.name}</h3>
-                <div
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    border: isActive ? "2px solid #7c3aed" : "2px solid #4b5563",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {isActive && (
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7c3aed" }} />
-                  )}
+              <div className="flex items-start gap-3 mb-2">
+                <span style={{ fontSize: 22, lineHeight: 1 }}>{t.emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-white text-sm">{t.name}</h3>
+                    {isActive && (
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7c3aed", flexShrink: 0 }} />
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#06b6d4", marginTop: 2 }}>{t.domain}</div>
                 </div>
               </div>
-              <div style={{ fontSize: 11, color: "#06b6d4", marginBottom: 4 }}>{t.domain}</div>
-              <p style={{ fontSize: 12, color: "#64748b" }}>{t.desc}</p>
+              <p style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.5, paddingLeft: 34 }}>{t.desc}</p>
             </div>
           );
         })}

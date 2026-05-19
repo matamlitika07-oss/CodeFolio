@@ -1,0 +1,396 @@
+You are a senior SaaS UI/UX designer and frontend engineer.
+
+Upgrade the existing CodeFolio portfolio templates into PREMIUM, MODERN, VISUALLY STUNNING, startup-quality templates.
+
+IMPORTANT:
+Do NOT redesign the whole app.
+Keep existing functionality working.
+Only improve:
+- aesthetics
+- layouts
+- animations
+- responsiveness
+- interactions
+- visual polish
+- portfolio presentation quality
+
+The templates must feel like:
+- Framer
+- Linear
+- Vercel
+- Webflow
+- Dribbble-level portfolio websites
+
+====================================================
+MAIN GOAL
+====================================================
+
+Transform CodeFolio from:
+"student project"
+
+into:
+"professional SaaS portfolio platform"
+
+Every template must feel:
+- unique
+- immersive
+- premium
+- modern
+- domain-specific
+
+====================================================
+GLOBAL DESIGN IMPROVEMENTS
+====================================================
+
+Apply these improvements across ALL templates:
+
+1. Better typography hierarchy
+- Large bold hero headings
+- Better spacing
+- Professional font pairings
+- Strong readability
+
+2. Smooth animations
+- fade-up animations
+- hover transitions
+- floating effects
+- glowing borders
+- parallax sections
+- staggered reveal animations
+
+3. Modern cards
+- glassmorphism
+- gradient borders
+- subtle shadows
+- hover elevation
+- animated outlines
+
+4. Better responsiveness
+- perfect mobile layouts
+- adaptive grids
+- mobile navigation
+- responsive typography
+
+5. Add section spacing
+- breathing room
+- clean alignment
+- modern layout rhythm
+
+6. Improve project showcase
+- bigger cards
+- screenshots
+- animated hover overlays
+- GitHub + Live Demo buttons
+- tech stack chips
+
+7. Improve skills sections
+- animated badges
+- categorized layouts
+- progress indicators
+- visual grouping
+
+8. Add micro-interactions
+- button hover glow
+- animated links
+- hover scale
+- smooth transforms
+
+9. Improve hero sections
+- immersive headers
+- background effects
+- gradients
+- spotlight lighting
+- animated elements
+
+10. Improve contact section
+- cleaner forms
+- glowing inputs
+- interactive buttons
+- better spacing
+
+====================================================
+ADD THESE NEW PROFESSIONAL TEMPLATES
+====================================================
+
+====================================================
+1. FRONTEND ENGINEER TEMPLATE
+====================================================
+
+Theme:
+Modern animated UI portfolio
+
+Style inspiration:
+- Framer
+- Vercel
+- React developer portfolios
+
+Features:
+- animated gradient background
+- floating UI cards
+- smooth scrolling
+- glowing buttons
+- modern glassmorphism
+- animated code snippets
+- large project previews
+- React/Vue/Next.js badges
+- animated hero
+
+Colors:
+- black
+- purple
+- blue gradients
+
+Fonts:
+- Inter
+- Satoshi
+
+====================================================
+2. BACKEND ENGINEER TEMPLATE
+====================================================
+
+Theme:
+Enterprise architecture aesthetic
+
+Style:
+- structured
+- clean
+- system design inspired
+
+Features:
+- architecture diagrams
+- API section
+- database visualization
+- backend stack cards
+- deployment section
+- service cards
+- terminal snippets
+
+Colors:
+- navy
+- steel blue
+- white
+- cyan accents
+
+Layout:
+- professional dashboard feel
+
+====================================================
+3. AI/ML ENGINEER TEMPLATE
+====================================================
+
+Theme:
+Futuristic AI dashboard
+
+Style:
+- data science workstation
+- neural network aesthetic
+
+Features:
+- model metrics cards
+- AI project cards
+- charts
+- animated data grids
+- research paper section
+- Kaggle/GitHub integrations
+- glowing data visualizations
+- dataset showcase
+
+Colors:
+- dark charcoal
+- neon blue
+- orange
+- purple
+
+Animations:
+- moving particles
+- data stream effects
+
+====================================================
+4. CYBERSECURITY TEMPLATE
+====================================================
+
+Theme:
+Elite hacker interface
+
+Style:
+- matrix
+- cyberpunk
+- terminal UI
+
+Features:
+- animated terminal
+- scanline overlay
+- glitch text
+- certifications section
+- bug bounty showcase
+- CTF achievements
+- cyber tool badges
+- neon hover effects
+
+Colors:
+- black
+- matrix green
+- red alerts
+- neon cyan
+
+Animations:
+- glitch effects
+- typing animation
+- scanlines
+- flickering UI
+
+====================================================
+5. DEVOPS / CLOUD TEMPLATE
+====================================================
+
+Theme:
+Infrastructure monitoring dashboard
+
+Features:
+- CI/CD pipeline visual
+- Kubernetes cards
+- AWS/GCP badges
+- server metrics
+- deployment timeline
+- monitoring widgets
+- cloud architecture sections
+
+Style:
+- futuristic infrastructure panel
+
+Colors:
+- dark navy
+- orange
+- cyan
+- gray
+
+====================================================
+6. MOBILE APP DEVELOPER TEMPLATE
+====================================================
+
+Theme:
+App Store inspired showcase
+
+Features:
+- phone mockups
+- app preview carousel
+- APK/App Store buttons
+- mobile UI screenshots
+- animated device frames
+- swipe interactions
+
+Style:
+- modern mobile-first design
+
+Colors:
+- white
+- blue
+- gradient accents
+
+====================================================
+7. STUDENT / PLACEMENT TEMPLATE
+====================================================
+
+IMPORTANT:
+This should become the BEST and MOST USEFUL template.
+
+Target users:
+- college students
+- placement seekers
+- freshers
+
+Features:
+- resume section
+- DSA stats
+- LeetCode integration UI
+- GitHub streak section
+- certifications
+- coding profiles
+- achievements timeline
+- recruiter-friendly layout
+- ATS-friendly design
+- clean project cards
+
+Style:
+- minimal
+- modern
+- highly professional
+
+Colors:
+- white
+- black
+- blue accents
+
+====================================================
+8. UI/UX DESIGNER TEMPLATE
+====================================================
+
+Theme:
+Dribbble + Behance inspired portfolio
+
+Features:
+- case studies
+- bento grids
+- colorful cards
+- Figma embeds
+- design process timeline
+- interactive mockups
+- animated gallery
+- moodboard sections
+
+Style:
+- creative
+- playful
+- highly visual
+
+Colors:
+- pastel gradients
+- pink
+- lavender
+- soft glassmorphism
+
+====================================================
+IMPORTANT IMPLEMENTATION RULES
+====================================================
+
+1. Keep all existing backend APIs working.
+
+2. Do NOT break current dashboard functionality.
+
+3. Every template must:
+- support projects
+- skills
+- social links
+- contact form
+- responsive design
+
+4. Add template preview thumbnails inside dashboard.
+
+5. Add hover animation previews for template cards.
+
+6. Add desktop/mobile preview toggle.
+
+7. Add smooth transitions between templates.
+
+8. Add loading skeletons for previews.
+
+9. Keep performance optimized:
+- avoid heavy libraries
+- use CSS animations where possible
+
+10. Make templates look production-ready.
+
+====================================================
+FINAL GOAL
+====================================================
+
+The final result should feel like:
+- a premium startup SaaS
+- visually addictive
+- recruiter impressive
+- modern developer portfolio platform
+
+The website should look polished enough that:
+- developers would genuinely want to use it
+- recruiters would be impressed
+- users would share their portfolio publicly
