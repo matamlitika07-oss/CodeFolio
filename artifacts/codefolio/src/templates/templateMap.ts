@@ -8,20 +8,25 @@ import CreativeStudioTemplate from './CreativeStudioTemplate';
 import DesignCanvasTemplate from './DesignCanvasTemplate';
 import CreativeMotionTemplate from './CreativeMotionTemplate';
 import PixelForgeTemplate from './PixelForgeTemplate';
+import LensCraftTemplate from './LensCraftTemplate';
 
 export const templateMap: Record<string, ComponentType<{ data: any }>> = {
-  // New templates
+  // Stream-assigned templates
+  'developer-pro': FrontendProTemplate,
+  'design-canvas': DesignCanvasTemplate,
+  'lens-craft': LensCraftTemplate,
+
+  // Existing templates
   'minimal-universal': MinimalUniversalTemplate,
   'frontend-pro': FrontendProTemplate,
   'fullstack-nexus': FullStackNexusTemplate,
   'backend-core': BackendCoreTemplate,
   'ai-matrix': AIMatrixTemplate,
   'creative-studio': CreativeStudioTemplate,
-  'design-canvas': DesignCanvasTemplate,
   'creative-motion': CreativeMotionTemplate,
   'pixel-forge': PixelForgeTemplate,
 
-  // Backward compatibility aliases mapping to the new upgraded templates
+  // Backward compatibility aliases
   'minimalist': MinimalUniversalTemplate,
   'creative': FrontendProTemplate,
   'corporate': CreativeStudioTemplate,
@@ -29,5 +34,11 @@ export const templateMap: Record<string, ComponentType<{ data: any }>> = {
   'game-dev': PixelForgeTemplate,
   'student': MinimalUniversalTemplate,
   'devops': BackendCoreTemplate,
-  'cyberpunk': DesignCanvasTemplate, // Fallback to canvas
+  'cyberpunk': DesignCanvasTemplate,
+};
+
+export const STREAM_TEMPLATE_MAP: Record<string, string> = {
+  'Developer': 'developer-pro',
+  'Graphic Designer': 'design-canvas',
+  'Photographer': 'lens-craft',
 };

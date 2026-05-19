@@ -1,0 +1,346 @@
+You are a senior full-stack SaaS engineer and UI/UX architect.
+
+Update my existing project called “CodeFolio” WITHOUT breaking the current website.
+
+IMPORTANT:
+This is an already working project with:
+
+* authentication
+* dashboard
+* templates
+* live preview
+* backend APIs
+* MongoDB
+* React frontend
+
+DO NOT rebuild the entire app.
+DO NOT remove existing functionality.
+DO NOT break authentication, routing, backend APIs, or dashboard logic.
+
+Your task is to carefully UPGRADE the existing architecture.
+
+====================================================
+MAIN CHANGE REQUIRED
+====================
+
+REMOVE:
+“Choose Template”
+
+REPLACE IT WITH:
+“Choose Your Stream”
+
+The user should first choose their profession/stream.
+
+Example:
+
+* Developer
+* Graphic Designer
+* Photographer
+
+Based on the selected stream:
+
+* automatically assign the correct template
+* show stream-specific dashboard inputs
+* render stream-specific portfolio layout
+
+====================================================
+IMPORTANT ARCHITECTURE RULE
+===========================
+
+Different streams MUST have completely different input forms.
+
+Developer inputs should NOT appear for photographers.
+
+Photographer fields should NOT appear for graphic designers.
+
+Implement CONDITIONAL DASHBOARD FORMS based on selected stream.
+
+====================================================
+SUPPORTED STREAMS
+=================
+
+1. Developer
+2. Graphic Designer
+3. Photographer
+
+====================================================
+
+1. DEVELOPER PORTFOLIO SYSTEM
+   ====================================================
+
+STREAM NAME:
+Developer
+
+TEMPLATE NAME:
+Developer Pro
+
+STYLE:
+
+* modern startup aesthetic
+* clean
+* professional
+* project-focused
+* responsive
+* developer portfolio inspired
+
+====================================================
+DEVELOPER REQUIRED INPUTS
+=========================
+
+Profile Inputs:
+
+* Developer Name
+* Role
+* Bio
+* Resume Link
+* Skills
+* Experience
+* Certifications
+* Coding Profiles
+* Social Links
+
+Project Inputs:
+
+* Project Title
+* Project Description
+* Tech Stack
+* GitHub Link
+* Live Demo
+
+====================================================
+DEVELOPER PORTFOLIO SECTIONS
+============================
+
+1. Hero Section
+2. About Section
+3. Projects Section
+4. Skills Section
+5. Experience Timeline
+6. Certifications
+7. GitHub / Coding Profiles
+8. Contact Section
+
+====================================================
+2. GRAPHIC DESIGNER PORTFOLIO SYSTEM
+====================================
+
+STREAM NAME:
+Graphic Designer
+
+TEMPLATE NAME:
+DesignCanvas
+
+STYLE:
+
+* Behance inspired
+* modern portfolio gallery
+* image-focused
+* artistic
+* elegant
+* minimal
+
+====================================================
+GRAPHIC DESIGNER REQUIRED INPUTS
+================================
+
+Profile Inputs:
+
+* Designer Name
+* Bio
+* Skills
+* Services
+* Testimonials
+* Social Links
+
+Project Inputs:
+
+* Portfolio Images
+* Project Title
+* Project Description
+* Brand/Client Name
+* Behance Link
+* Dribbble Link
+
+====================================================
+GRAPHIC DESIGNER PORTFOLIO SECTIONS
+===================================
+
+1. Hero Section
+2. About Section
+3. Portfolio Gallery
+4. Featured Projects
+5. Skills Section
+6. Services Section
+7. Testimonials
+8. Contact Section
+
+IMPORTANT:
+Portfolio gallery must support:
+
+* image uploads
+* masonry grid
+* fullscreen preview
+* hover zoom effects
+
+====================================================
+3. PHOTOGRAPHER PORTFOLIO SYSTEM
+================================
+
+STREAM NAME:
+Photographer
+
+TEMPLATE NAME:
+LensCraft
+
+STYLE:
+
+* cinematic
+* minimal
+* luxury photography website
+* immersive
+* image-heavy
+
+====================================================
+PHOTOGRAPHER REQUIRED INPUTS
+============================
+
+Profile Inputs:
+
+* Photographer Name
+* Bio
+* Photography Style
+* Instagram Link
+* Location
+* Contact Details
+
+Gallery Inputs:
+
+* Portfolio Images
+* Shoot Title
+* Shoot Description
+* Categories
+
+Additional Inputs:
+
+* Services
+* Testimonials
+
+====================================================
+PHOTOGRAPHER PORTFOLIO SECTIONS
+===============================
+
+1. Hero Section
+2. About Section
+3. Photography Gallery
+4. Featured Shoots
+5. Services Section
+6. Testimonials
+7. Contact / Booking Section
+
+IMPORTANT:
+Photography gallery must support:
+
+* fullscreen lightbox
+* masonry image layout
+* category filters
+* hover zoom
+* cinematic layout
+
+====================================================
+DATABASE CHANGES
+================
+
+Carefully extend the existing MongoDB schema.
+
+Add:
+
+* streamType
+* stream-specific fields
+
+IMPORTANT:
+DO NOT break old users or existing portfolios.
+
+Use safe optional fields.
+
+====================================================
+DASHBOARD CHANGES
+=================
+
+1. Add stream selection step during onboarding.
+
+2. Based on selected stream:
+
+* show correct input forms
+* hide unrelated fields
+* load correct template
+
+3. Add:
+
+* image upload support
+* gallery preview
+* drag-and-drop ordering
+* fullscreen portfolio preview
+
+4. Improve dashboard UI:
+
+* cleaner spacing
+* better responsiveness
+* modern SaaS styling
+
+====================================================
+LIVE PREVIEW CHANGES
+====================
+
+Update live preview system so:
+
+* preview changes dynamically based on stream
+* photographer preview supports galleries
+* designer preview supports portfolio layouts
+* developer preview supports project cards
+
+====================================================
+IMPORTANT IMPLEMENTATION RULES
+==============================
+
+1. Do NOT break current APIs.
+2. Keep authentication working.
+3. Keep routing working.
+4. Keep MongoDB compatibility.
+5. Keep responsive design.
+6. Maintain current project structure.
+7. Use reusable components.
+8. Avoid rewriting entire architecture.
+9. Carefully refactor existing templates.
+10. Ensure production-ready code quality.
+
+====================================================
+FINAL GOAL
+==========
+
+CodeFolio should evolve from:
+“generic template website”
+
+into:
+“multi-stream portfolio platform”
+
+Where:
+
+* developers get developer portfolios
+* photographers get photography portfolios
+* graphic designers get design portfolios
+
+Each stream should have:
+
+* specialized inputs
+* specialized sections
+* specialized layouts
+* specialized aesthetics
+
+The final result should feel:
+
+* modern
+* premium
+* polished
+* startup-quality
+* production-ready
+* visually immersive

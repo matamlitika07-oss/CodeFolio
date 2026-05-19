@@ -48,29 +48,77 @@ export const LoginResponse = zod.object({
 })
 })
 
-
-/**
- * @summary Get current user portfolio data
- */
-export const GetMeResponse = zod.object({
-  "id": zod.number(),
-  "username": zod.string(),
-  "email": zod.string(),
-  "templateId": zod.string(),
-  "profile": zod.object({
+// Shared extended profile schema
+const ExtendedProfileSchema = zod.object({
   "name": zod.string().nullish(),
   "bio": zod.string().nullish(),
   "avatarUrl": zod.string().nullish(),
   "resumeUrl": zod.string().nullish(),
   "domain": zod.string().nullish(),
+  "role": zod.string().nullish(),
+  "photographyStyle": zod.string().nullish(),
+  "location": zod.string().nullish(),
+  "shootCategories": zod.array(zod.string()).optional(),
   "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
+    "github": zod.string().nullish(),
+    "linkedin": zod.string().nullish(),
+    "twitter": zod.string().nullish(),
+    "website": zod.string().nullish(),
+    "instagram": zod.string().nullish(),
+    "behance": zod.string().nullish(),
+    "dribbble": zod.string().nullish(),
+  }).optional(),
+  "experience": zod.array(zod.object({
+    "id": zod.string(),
+    "company": zod.string(),
+    "role": zod.string(),
+    "duration": zod.string(),
+    "description": zod.string().nullish(),
+  })).optional(),
+  "certifications": zod.array(zod.object({
+    "id": zod.string(),
+    "name": zod.string(),
+    "issuer": zod.string().nullish(),
+    "year": zod.string().nullish(),
+    "link": zod.string().nullish(),
+  })).optional(),
+  "codingProfiles": zod.object({
+    "leetcode": zod.string().nullish(),
+    "hackerrank": zod.string().nullish(),
+    "codeforces": zod.string().nullish(),
+    "kaggle": zod.string().nullish(),
+  }).nullish(),
+  "galleryImages": zod.array(zod.object({
+    "id": zod.string(),
+    "url": zod.string(),
+    "title": zod.string().nullish(),
+    "description": zod.string().nullish(),
+    "category": zod.string().nullish(),
+    "clientName": zod.string().nullish(),
+  })).optional(),
+  "services": zod.array(zod.object({
+    "id": zod.string(),
+    "title": zod.string(),
+    "description": zod.string().nullish(),
+  })).optional(),
+  "testimonials": zod.array(zod.object({
+    "id": zod.string(),
+    "name": zod.string(),
+    "text": zod.string(),
+    "company": zod.string().nullish(),
+    "role": zod.string().nullish(),
+  })).optional(),
+});
+
+const ExtendedSkillsSchema = zod.object({
+  "frontend": zod.array(zod.string()).optional(),
+  "backend": zod.array(zod.string()).optional(),
+  "devops": zod.array(zod.string()).optional(),
+  "other": zod.array(zod.string()).optional(),
+  "tools": zod.array(zod.string()).optional(),
+});
+
+const ProjectSchema = zod.object({
   "id": zod.string(),
   "title": zod.string(),
   "description": zod.string().nullish(),
@@ -78,14 +126,23 @@ export const GetMeResponse = zod.object({
   "repoLink": zod.string().nullish(),
   "liveLink": zod.string().nullish(),
   "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
+});
+
+const FullUserSchema = zod.object({
+  "id": zod.number(),
+  "username": zod.string(),
+  "email": zod.string(),
+  "templateId": zod.string(),
+  "profile": ExtendedProfileSchema.optional(),
+  "projects": zod.array(ProjectSchema).optional(),
+  "skills": ExtendedSkillsSchema.optional(),
+});
+
+
+/**
+ * @summary Get current user portfolio data
+ */
+export const GetMeResponse = FullUserSchema;
 
 
 /**
@@ -94,154 +151,30 @@ export const GetMeResponse = zod.object({
 export const UpdateProfileBody = zod.object({
   "contactEmail": zod.string().nullish(),
   "templateId": zod.string().nullish(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional()
+  "profile": ExtendedProfileSchema.optional()
 })
 
-export const UpdateProfileResponse = zod.object({
-  "id": zod.number(),
-  "username": zod.string(),
-  "email": zod.string(),
-  "templateId": zod.string(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
+export const UpdateProfileResponse = FullUserSchema;
 
 
 /**
  * @summary Replace projects array
  */
 export const UpdateProjectsBody = zod.object({
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-}))
+  "projects": zod.array(ProjectSchema)
 })
 
-export const UpdateProjectsResponse = zod.object({
-  "id": zod.number(),
-  "username": zod.string(),
-  "email": zod.string(),
-  "templateId": zod.string(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
+export const UpdateProjectsResponse = FullUserSchema;
 
 
 /**
  * @summary Replace skills object
  */
 export const UpdateSkillsBody = zod.object({
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-})
+  "skills": ExtendedSkillsSchema
 })
 
-export const UpdateSkillsResponse = zod.object({
-  "id": zod.number(),
-  "username": zod.string(),
-  "email": zod.string(),
-  "templateId": zod.string(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
+export const UpdateSkillsResponse = FullUserSchema;
 
 
 /**
@@ -251,47 +184,14 @@ export const UpdateTemplateBody = zod.object({
   "templateId": zod.string()
 })
 
-export const UpdateTemplateResponse = zod.object({
-  "id": zod.number(),
-  "username": zod.string(),
-  "email": zod.string(),
-  "templateId": zod.string(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
+export const UpdateTemplateResponse = FullUserSchema;
 
 
 /**
  * @summary Send contact message to a portfolio owner
  */
 export const SendContactParams = zod.object({
-  "username": zod.coerce.string()
+  "username": zod.string()
 })
 
 export const SendContactBody = zod.object({
@@ -309,41 +209,14 @@ export const SendContactResponse = zod.object({
  * @summary Get a public portfolio by username
  */
 export const GetPublicPortfolioParams = zod.object({
-  "username": zod.coerce.string()
+  "username": zod.string()
 })
 
 export const GetPublicPortfolioResponse = zod.object({
   "id": zod.number(),
   "username": zod.string(),
   "templateId": zod.string(),
-  "profile": zod.object({
-  "name": zod.string().nullish(),
-  "bio": zod.string().nullish(),
-  "avatarUrl": zod.string().nullish(),
-  "resumeUrl": zod.string().nullish(),
-  "domain": zod.string().nullish(),
-  "socialLinks": zod.object({
-  "github": zod.string().nullish(),
-  "linkedin": zod.string().nullish(),
-  "twitter": zod.string().nullish(),
-  "website": zod.string().nullish()
-}).optional()
-}).optional(),
-  "projects": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "description": zod.string().nullish(),
-  "techStack": zod.array(zod.string()).optional(),
-  "repoLink": zod.string().nullish(),
-  "liveLink": zod.string().nullish(),
-  "screenshotUrl": zod.string().nullish()
-})).optional(),
-  "skills": zod.object({
-  "frontend": zod.array(zod.string()).optional(),
-  "backend": zod.array(zod.string()).optional(),
-  "devops": zod.array(zod.string()).optional(),
-  "other": zod.array(zod.string()).optional()
-}).optional()
-})
-
-
+  "profile": ExtendedProfileSchema.optional(),
+  "projects": zod.array(ProjectSchema).optional(),
+  "skills": ExtendedSkillsSchema.optional(),
+});
