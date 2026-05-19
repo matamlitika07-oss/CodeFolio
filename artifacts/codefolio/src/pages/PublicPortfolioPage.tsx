@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "wouter";
 import { useGetPublicPortfolio } from "@workspace/api-client-react";
 import { templateMap } from "@/templates/templateMap";
+import { Loader2 } from "lucide-react";
 
 export default function PublicPortfolioPage() {
   const { username } = useParams<{ username: string }>();
@@ -27,22 +28,24 @@ export default function PublicPortfolioPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="min-h-screen bg-[#030303] flex flex-col items-center justify-center text-white">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+        <p className="text-gray-400 font-mono text-sm tracking-widest uppercase">Loading Profile</p>
       </div>
     );
   }
 
   if (error || !portfolio) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-gray-400">Portfolio not found for {username}</p>
+      <div className="min-h-screen bg-[#030303] flex flex-col items-center justify-center text-white p-6 text-center">
+        <h1 className="text-6xl font-bold tracking-tighter mb-4 text-white/20">404</h1>
+        <p className="text-xl text-gray-400 mb-8">Portfolio stream disconnected.</p>
+        <p className="text-sm text-gray-600">The user "{username}" does not exist or has unpublished their portfolio.</p>
       </div>
     );
   }
 
-  const TemplateComponent = templateMap[portfolio.templateId] || templateMap.minimalist;
+  const TemplateComponent = templateMap[portfolio.templateId] || templateMap['minimal-universal'] || templateMap.minimalist;
 
   return <TemplateComponent data={portfolio} />;
 }

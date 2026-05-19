@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, Link } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   useGetMe,
   useUpdateProfile,
@@ -12,7 +13,6 @@ import { templateMap } from "@/templates/templateMap";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -20,113 +20,69 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Copy, ExternalLink, LogOut, Plus, Trash2, Edit2 } from "lucide-react";
+import { Copy, ExternalLink, LogOut, Plus, Trash2, Edit2, Code2, MonitorSmartphone, LayoutTemplate, Network, Database, Cpu, PenTool, Palette, Sparkles, Terminal, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// ─── Profile completion ───────────────────────────────────────────────────────
+const STREAM_OPTIONS = [
+  { value: "Frontend", label: "Frontend", icon: <LayoutTemplate size={16} /> },
+  { value: "Backend", label: "Backend", icon: <Database size={16} /> },
+  { value: "Fullstack", label: "Fullstack", icon: <Network size={16} /> },
+  { value: "DevOps", label: "DevOps", icon: <Terminal size={16} /> },
+  { value: "Data Science", label: "Data Science / AI", icon: <Cpu size={16} /> },
+  { value: "Game Dev", label: "Game Dev", icon: <Code2 size={16} /> },
+  { value: "Mobile", label: "Mobile Dev", icon: <MonitorSmartphone size={16} /> },
+  { value: "UI/UX", label: "UI/UX Design", icon: <PenTool size={16} /> },
+  { value: "Creative", label: "Creative Dev", icon: <Sparkles size={16} /> },
+];
+
+const TEMPLATE_OPTIONS = [
+  { id: "minimal-universal", name: "Minimal Universal", category: "Any", previewColor: "from-gray-700 to-gray-900" },
+  { id: "frontend-pro", name: "Frontend Pro", category: "Frontend", previewColor: "from-blue-600 to-cyan-600" },
+  { id: "fullstack-nexus", name: "FullStack Nexus", category: "Fullstack", previewColor: "from-indigo-600 to-purple-600" },
+  { id: "backend-core", name: "Backend Core", category: "Backend/DevOps", previewColor: "from-emerald-600 to-teal-600" },
+  { id: "ai-matrix", name: "AI Matrix", category: "Data Science", previewColor: "from-purple-600 to-pink-600" },
+  { id: "creative-studio", name: "Creative Studio", category: "UI/UX", previewColor: "from-pink-500 to-orange-400" },
+  { id: "design-canvas", name: "Design Canvas", category: "Design", previewColor: "from-orange-500 to-yellow-500" },
+  { id: "creative-motion", name: "Creative Motion", category: "Creative", previewColor: "from-yellow-400 to-red-500" },
+  { id: "pixel-forge", name: "Pixel Forge", category: "Game Dev", previewColor: "from-green-500 to-emerald-700" }
+];
 
 function calculateCompletion(userData: any): number {
   const checks = [
     userData?.profile?.name,
     userData?.profile?.bio,
-    userData?.profile?.avatarUrl,
-    userData?.profile?.socialLinks?.github,
-    userData?.profile?.socialLinks?.linkedin,
+    userData?.profile?.domain,
+    userData?.profile?.socialLinks?.github || userData?.profile?.socialLinks?.linkedin,
     userData?.projects?.length > 0,
-    userData?.skills?.frontend?.length > 0,
-    userData?.templateId && userData?.templateId !== "minimalist",
+    userData?.skills && Object.values(userData.skills).some((arr: any) => arr?.length > 0),
+    userData?.templateId,
   ];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100) || 0;
 }
-
-// ─── Save button ──────────────────────────────────────────────────────────────
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
-function SaveButton({
-  status,
-  onClick,
-  label = "Save",
-}: {
-  status: SaveStatus;
-  onClick: () => void;
-  label?: string;
-}) {
-  const bg =
-    status === "saved"
-      ? "linear-gradient(135deg, #065f46, #047857)"
-      : status === "error"
-        ? "linear-gradient(135deg, #7f1d1d, #991b1b)"
-        : "linear-gradient(135deg, #7c3aed, #06b6d4)";
-
+function SaveButton({ status, onClick, label = "Save Changes" }: { status: SaveStatus; onClick: () => void; label?: string; }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={status === "saving"}
-      style={{
-        width: "100%",
-        borderRadius: 12,
-        fontWeight: 700,
-        color: "white",
-        padding: "12px 0",
-        fontSize: 14,
-        background: bg,
-        border: "none",
-        cursor: status === "saving" ? "not-allowed" : "pointer",
-        opacity: status === "saving" ? 0.75 : 1,
-        transition: "all 0.2s",
-      }}
-    >
-      {status === "saving"
-        ? "Saving..."
-        : status === "saved"
-          ? "✓ Saved!"
+      className={`w-full h-12 rounded-xl font-bold transition-all relative overflow-hidden ${
+        status === "saved" 
+          ? "bg-emerald-500 hover:bg-emerald-600 text-white" 
           : status === "error"
-            ? "Failed — Retry"
-            : label}
-    </button>
+          ? "bg-red-500 hover:bg-red-600 text-white"
+          : "bg-white text-black hover:bg-gray-200"
+      }`}
+    >
+      <span className="relative z-10 flex items-center justify-center gap-2">
+        {status === "saving" && <span className="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent" />}
+        {status === "saving" ? "Saving..." : status === "saved" ? <><CheckCircle2 className="w-4 h-4" /> Saved</> : status === "error" ? "Failed. Retry?" : label}
+      </span>
+    </Button>
   );
 }
-
-// ─── Inline SVG nav icons ────────────────────────────────────────────────────
-
-const IconProfile = () => (
-  <svg style={{ width: 18, height: 18, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-const IconProjects = () => (
-  <svg style={{ width: 18, height: 18, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="7" height="7" />
-    <rect x="14" y="3" width="7" height="7" />
-    <rect x="3" y="14" width="7" height="7" />
-    <rect x="14" y="14" width="7" height="7" />
-  </svg>
-);
-const IconSkills = () => (
-  <svg style={{ width: 18, height: 18, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-  </svg>
-);
-const IconTemplate = () => (
-  <svg style={{ width: 18, height: 18, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="10" />
-    <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-    <line x1="9" y1="9" x2="9.01" y2="9" />
-    <line x1="15" y1="9" x2="15.01" y2="9" />
-  </svg>
-);
-
-const NAV_ITEMS = [
-  { id: "profile", label: "Profile", Icon: IconProfile },
-  { id: "projects", label: "Projects", Icon: IconProjects },
-  { id: "skills", label: "Skills", Icon: IconSkills },
-  { id: "theme", label: "Template", Icon: IconTemplate },
-];
-
-// ─── DashboardPage ────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
@@ -155,300 +111,141 @@ export default function DashboardPage() {
 
   if (isLoading || !localData) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center text-white text-lg"
-        style={{ background: "#0a0f1e" }}
-      >
-        Loading…
+      <div className="min-h-screen bg-[#030303] flex items-center justify-center text-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-white" />
       </div>
     );
   }
 
   const completion = calculateCompletion(localData);
-  const initials = (localData.profile?.name || localData.username || "U")
-    .charAt(0)
-    .toUpperCase();
-
-  const handleLogout = () => {
-    logout();
-    setLocation("/");
-  };
-
-  const copyUrl = () => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/${user?.username}`
-    );
-    toast({ title: "Portfolio URL copied!" });
-  };
-
-  const TemplatePreview =
-    templateMap[localData.templateId] || templateMap.minimalist;
+  const initials = (localData.profile?.name || localData.username || "U").charAt(0).toUpperCase();
+  const TemplatePreview = templateMap[localData.templateId] || templateMap.minimalist || templateMap['minimal-universal'];
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ background: "#0a0f1e" }}>
-      {/* ── Sidebar ── */}
-      <aside
-        className="flex flex-col gap-3 overflow-y-auto shrink-0"
-        style={{ width: 280, minWidth: 280, background: "#0f1629", padding: 16 }}
-      >
-        {/* User Card */}
-        <div style={{ background: "#1a2340", borderRadius: 16, padding: 20 }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div
-              className="flex items-center justify-center shrink-0 font-bold text-lg text-white"
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
-              }}
-            >
-              {initials}
+    <div className="h-screen flex bg-[#030303] text-white font-sans overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-[280px] shrink-0 border-r border-white/10 flex flex-col bg-[#0a0a0a]">
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-8 text-white/90">
+            <Code2 className="w-5 h-5 text-purple-500" />
+            <span className="font-bold tracking-tight">CodeFolio</span>
+          </div>
+
+          <div className="bg-[#111] border border-white/5 rounded-2xl p-4 mb-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-50" />
+            <div className="relative z-10 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-bold text-lg shadow-inner">
+                {initials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold truncate text-sm">{localData.profile?.name || localData.username}</div>
+                <div className="text-xs text-gray-400 truncate">@{localData.username}</div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p
-                className="font-semibold truncate m-0 leading-tight"
-                style={{ color: "#f1f5f9", fontSize: 16 }}
-              >
-                {localData.profile?.name || localData.username}
-              </p>
-              <p
-                className="m-0 truncate leading-tight mt-0.5"
-                style={{ color: "#64748b", fontSize: 13 }}
-              >
-                @{localData.username}
-              </p>
+            <div className="relative z-10 mt-4">
+              <div className="flex justify-between text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-semibold">
+                <span>Profile</span>
+                <span>{completion}%</span>
+              </div>
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 transition-all duration-500" style={{ width: `${completion}%` }} />
+              </div>
             </div>
           </div>
 
-          {/* Progress bar */}
-          <div style={{ marginTop: 12 }}>
-            <div
-              className="flex justify-between"
-              style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}
-            >
-              <span>Profile completion</span>
-              <span>{completion}%</span>
-            </div>
-            <div
-              style={{
-                height: 6,
-                background: "#2d3748",
-                borderRadius: 999,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  borderRadius: 999,
-                  background: "linear-gradient(90deg, #7c3aed, #06b6d4)",
-                  width: `${completion}%`,
-                  transition: "width 0.5s ease",
-                }}
-              />
-            </div>
-          </div>
+          <nav className="flex flex-col gap-1">
+            {[
+              { id: "profile", label: "Identity", icon: <MonitorSmartphone size={18} /> },
+              { id: "projects", label: "Projects", icon: <LayoutTemplate size={18} /> },
+              { id: "skills", label: "Skills", icon: <Terminal size={18} /> },
+              { id: "theme", label: "Aesthetic", icon: <Palette size={18} /> },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  activeTab === item.id 
+                    ? "bg-white/10 text-white" 
+                    : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* Nav Card */}
-        <div
-          style={{
-            background: "#1a2340",
-            borderRadius: 16,
-            padding: 8,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          {NAV_ITEMS.map(({ id, label, Icon }) => {
-            const isActive = activeTab === id;
-            return (
-              <NavItem
-                key={id}
-                id={id}
-                label={label}
-                Icon={Icon}
-                isActive={isActive}
-                onClick={() => setActiveTab(id)}
-              />
-            );
-          })}
-        </div>
-
-        {/* Bottom actions */}
-        <div className="mt-auto flex flex-col gap-1 pt-2">
+        <div className="mt-auto p-4 border-t border-white/5 flex flex-col gap-1">
           <Link href={`/${user?.username}`}>
-            <SidebarAction icon={<ExternalLink size={14} />} label="View Live" />
+            <button className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+              <ExternalLink size={16} /> View Live
+            </button>
           </Link>
-          <SidebarAction icon={<Copy size={14} />} label="Copy URL" onClick={copyUrl} />
-          <SidebarAction
-            icon={<LogOut size={14} />}
-            label="Log out"
-            onClick={handleLogout}
-            muted
-          />
+          <button 
+            onClick={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/${user?.username}`);
+              toast({ title: "URL copied to clipboard" });
+            }}
+            className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <Copy size={16} /> Copy URL
+          </button>
+          <button 
+            onClick={() => { logout(); setLocation("/"); }}
+            className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 hover:bg-white/5 transition-colors mt-2"
+          >
+            <LogOut size={16} /> Log Out
+          </button>
         </div>
       </aside>
 
-      {/* ── Main area ── */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Content panel */}
-        <div className="flex-1 overflow-y-auto" style={{ padding: 28 }}>
-          {activeTab === "profile" && (
-            <ProfileForm
-              user={user}
-              setLocalData={setLocalData}
-              updateProfile={updateProfile}
-            />
-          )}
-          {activeTab === "projects" && (
-            <ProjectsForm
-              user={user}
-              setLocalData={setLocalData}
-              updateProjects={updateProjects}
-            />
-          )}
-          {activeTab === "skills" && (
-            <SkillsForm
-              user={user}
-              setLocalData={setLocalData}
-              updateSkills={updateSkills}
-            />
-          )}
-          {activeTab === "theme" && (
-            <ThemeSelector
-              currentTemplate={localData.templateId}
-              setLocalData={setLocalData}
-              updateTemplate={updateTemplate}
-              toast={toast}
-            />
-          )}
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto bg-[#030303] relative scroll-smooth">
+        <div className="max-w-3xl mx-auto p-8 lg:p-12 pb-32">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === "profile" && <ProfileForm user={user} setLocalData={setLocalData} updateProfile={updateProfile} />}
+              {activeTab === "projects" && <ProjectsForm user={user} setLocalData={setLocalData} updateProjects={updateProjects} />}
+              {activeTab === "skills" && <SkillsForm user={user} setLocalData={setLocalData} updateSkills={updateSkills} />}
+              {activeTab === "theme" && <ThemeSelector currentTemplate={localData.templateId} setLocalData={setLocalData} updateTemplate={updateTemplate} toast={toast} />}
+            </motion.div>
+          </AnimatePresence>
         </div>
+      </main>
 
-        {/* Live preview */}
-        <div
-          className="hidden xl:flex flex-col items-center overflow-hidden border-l border-white/5"
-          style={{ width: 420, padding: "24px 16px", background: "#080c18" }}
-        >
-          <p
-            className="text-xs font-medium tracking-widest uppercase mb-4"
-            style={{ color: "#4b5563" }}
+      {/* Live Preview Pane */}
+      <aside className="hidden xl:flex flex-col w-[450px] border-l border-white/10 bg-[#000]">
+        <div className="p-4 border-b border-white/5 flex justify-between items-center">
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-500">Live Preview</span>
+        </div>
+        <div className="flex-1 overflow-hidden relative p-4 flex items-start justify-center bg-[#050505]">
+          <div 
+            className="w-full aspect-[9/16] max-h-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black"
+            style={{ zoom: 0.6, transformOrigin: 'top center', width: '100%', minWidth: 375, height: 812 }}
           >
-            Live Preview
-          </p>
-          <div
-            className="w-full rounded-xl overflow-hidden border border-white/5 shadow-2xl pointer-events-none"
-            style={{
-              height: 700,
-              transform: "scale(0.6)",
-              transformOrigin: "top center",
-              minWidth: 640,
-            }}
-          >
-            <TemplatePreview data={localData} />
+            {TemplatePreview ? <TemplatePreview data={localData} /> : null}
           </div>
         </div>
-      </div>
+      </aside>
     </div>
   );
 }
 
-// ─── Sidebar helpers ──────────────────────────────────────────────────────────
-
-function NavItem({
-  id,
-  label,
-  Icon,
-  isActive,
-  onClick,
-}: {
-  id: string;
-  label: string;
-  Icon: React.ComponentType;
-  isActive: boolean;
-  onClick: () => void;
-}) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        width: "100%",
-        padding: "10px 14px",
-        borderRadius: 10,
-        cursor: "pointer",
-        color: isActive ? "#06b6d4" : "#94a3b8",
-        background: isActive ? "#232d4a" : hovered ? "#1e2a42" : "transparent",
-        fontSize: 14,
-        fontWeight: 500,
-        border: "none",
-        outline: "none",
-        textAlign: "left",
-        transition: "all 0.15s",
-      }}
-    >
-      <Icon />
-      {label}
-    </button>
-  );
-}
-
-function SidebarAction({
-  icon,
-  label,
-  onClick,
-  muted,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  onClick?: () => void;
-  muted?: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        width: "100%",
-        padding: "9px 14px",
-        borderRadius: 10,
-        cursor: "pointer",
-        color: muted ? "#4b5563" : hovered ? "#e2e8f0" : "#64748b",
-        background: hovered && !muted ? "#1e2a42" : "transparent",
-        fontSize: 13,
-        fontWeight: 500,
-        border: "none",
-        outline: "none",
-        textAlign: "left",
-        transition: "all 0.15s",
-      }}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
-// ─── ProfileForm ──────────────────────────────────────────────────────────────
+// ─── Forms ──────────────────────────────────────────────────────────────────
 
 function ProfileForm({ user, setLocalData, updateProfile }: any) {
-  const formRef = useRef<HTMLFormElement>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [domain, setDomain] = useState<string>(user.profile?.domain || "");
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const readFormData = useCallback(() => {
+  const readData = useCallback(() => {
     const fd = new FormData(formRef.current!);
     return {
       profile: {
@@ -469,119 +266,101 @@ function ProfileForm({ user, setLocalData, updateProfile }: any) {
   }, [domain]);
 
   const handleChange = () => {
-    const data = readFormData();
-    setLocalData((prev: any) => ({
-      ...prev,
-      profile: data.profile,
-    }));
-  };
-
-  const handleDomainChange = (val: string) => {
-    setDomain(val);
-    setLocalData((prev: any) => ({
-      ...prev,
-      profile: { ...prev.profile, domain: val },
-    }));
+    const data = readData();
+    setLocalData((prev: any) => ({ ...prev, profile: data.profile }));
   };
 
   const handleSave = () => {
-    const data = readFormData();
     setSaveStatus("saving");
     updateProfile.mutate(
-      { data },
+      { data: readData() },
       {
-        onSuccess: () => {
-          setSaveStatus("saved");
-          setTimeout(() => setSaveStatus("idle"), 2000);
-        },
+        onSuccess: () => { setSaveStatus("saved"); setTimeout(() => setSaveStatus("idle"), 2000); },
         onError: () => setSaveStatus("error"),
       }
     );
   };
 
   return (
-    <form ref={formRef} onChange={handleChange} className="space-y-5 max-w-2xl">
-      <SectionHeader title="Basic Info" />
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Full Name">
-          <Input name="name" defaultValue={user.profile?.name || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-        <Field label="Domain / Role">
-          <Select value={domain} onValueChange={handleDomainChange}>
-            <SelectTrigger className="bg-black/40 border-white/10 text-white">
-              <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Frontend">Frontend Developer</SelectItem>
-              <SelectItem value="Backend">Backend Developer</SelectItem>
-              <SelectItem value="Fullstack">Fullstack Developer</SelectItem>
-              <SelectItem value="DevOps">DevOps Engineer</SelectItem>
-              <SelectItem value="Data Science">Data Scientist</SelectItem>
-              <SelectItem value="Game Dev">Game Developer</SelectItem>
-              <SelectItem value="Mobile">Mobile Developer</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
+    <form ref={formRef} onChange={handleChange} className="space-y-10">
+      <div>
+        <h2 className="text-2xl font-bold mb-6 tracking-tight">Identity</h2>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Full Name</label>
+              <Input name="name" defaultValue={user.profile?.name || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Primary Stream</label>
+              <Select value={domain} onValueChange={(v) => { setDomain(v); handleChange(); }}>
+                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500">
+                  <SelectValue placeholder="Select your stream" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#111] border-white/10 text-white">
+                  {STREAM_OPTIONS.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <div className="flex items-center gap-2">{opt.icon} {opt.label}</div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Short Bio</label>
+            <Textarea name="bio" defaultValue={user.profile?.bio || ""} className="bg-white/5 border-white/10 text-white h-24 rounded-xl focus:border-purple-500 resize-none" placeholder="Craft your narrative..." />
+          </div>
+        </div>
       </div>
 
-      <Field label="Bio">
-        <Textarea name="bio" defaultValue={user.profile?.bio || ""} className="bg-black/40 border-white/10 text-white h-24" />
-      </Field>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Avatar URL">
-          <Input name="avatarUrl" defaultValue={user.profile?.avatarUrl || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-        <Field label="Resume URL">
-          <Input name="resumeUrl" defaultValue={user.profile?.resumeUrl || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
+      <div className="pt-6 border-t border-white/10">
+        <h2 className="text-2xl font-bold mb-6 tracking-tight">Links & Presence</h2>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">GitHub</label>
+            <Input name="github" defaultValue={user.profile?.socialLinks?.github || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" placeholder="https://github.com/..." />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">LinkedIn</label>
+            <Input name="linkedin" defaultValue={user.profile?.socialLinks?.linkedin || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" placeholder="https://linkedin.com/in/..." />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Twitter / X</label>
+            <Input name="twitter" defaultValue={user.profile?.socialLinks?.twitter || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Personal Website</label>
+            <Input name="website" defaultValue={user.profile?.socialLinks?.website || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Resume URL</label>
+            <Input name="resumeUrl" defaultValue={user.profile?.resumeUrl || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" placeholder="Link to PDF" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Public Contact Email</label>
+            <Input name="contactEmail" defaultValue={user.email || ""} className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+          </div>
+        </div>
       </div>
 
-      <SectionHeader title="Links & Contact" className="mt-8 pt-4 border-t border-white/10" />
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="GitHub URL">
-          <Input name="github" defaultValue={user.profile?.socialLinks?.github || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-        <Field label="LinkedIn URL">
-          <Input name="linkedin" defaultValue={user.profile?.socialLinks?.linkedin || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-        <Field label="Twitter URL">
-          <Input name="twitter" defaultValue={user.profile?.socialLinks?.twitter || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-        <Field label="Website URL">
-          <Input name="website" defaultValue={user.profile?.socialLinks?.website || ""} className="bg-black/40 border-white/10 text-white" />
-        </Field>
-      </div>
-
-      <Field label="Public Contact Email">
-        <Input name="contactEmail" defaultValue={user.email || ""} className="bg-black/40 border-white/10 text-white" />
-      </Field>
-
-      <div className="pt-4">
-        <SaveButton status={saveStatus} onClick={handleSave} label="Save Profile" />
+      <div className="pt-4 sticky bottom-8 z-20">
+        <SaveButton status={saveStatus} onClick={handleSave} />
       </div>
     </form>
   );
 }
 
-// ─── ProjectsForm ─────────────────────────────────────────────────────────────
-
 function ProjectsForm({ user, setLocalData, updateProjects }: any) {
   const [projects, setProjects] = useState<any[]>(user.projects || []);
-  const [isDirty, setIsDirty] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
-  const [editingId, setEditingId] = useState<string | undefined | null>(null);
-
-  useEffect(() => {
-    setProjects(user.projects || []);
-  }, [user]);
 
   const applyProjects = (updated: any[]) => {
     setProjects(updated);
-    setIsDirty(true);
-    setSaveStatus("idle");
     setLocalData((prev: any) => ({ ...prev, projects: updated }));
   };
 
@@ -590,328 +369,236 @@ function ProjectsForm({ user, setLocalData, updateProjects }: any) {
     updateProjects.mutate(
       { data: { projects } },
       {
-        onSuccess: () => {
-          setIsDirty(false);
-          setSaveStatus("saved");
-          setTimeout(() => setSaveStatus("idle"), 2000);
-        },
+        onSuccess: () => { setSaveStatus("saved"); setTimeout(() => setSaveStatus("idle"), 2000); },
         onError: () => setSaveStatus("error"),
       }
     );
   };
 
-  const deleteProject = (id: string) => {
-    applyProjects(projects.filter((p) => p.id !== id));
-  };
-
-  const handleProjectSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const techStackStr = fd.get("techStack") as string;
-    const projectData = {
-      id: typeof editingId === "string" ? editingId : Math.random().toString(36).substring(7),
+    const tsStr = fd.get("techStack") as string;
+    const project = {
+      id: editingId === "new" ? Math.random().toString(36).substring(7) : editingId,
       title: fd.get("title") as string,
       description: fd.get("description") as string,
-      techStack: techStackStr.split(",").map((s: string) => s.trim()).filter(Boolean),
+      techStack: tsStr.split(",").map(s => s.trim()).filter(Boolean),
       repoLink: fd.get("repoLink") as string,
       liveLink: fd.get("liveLink") as string,
       screenshotUrl: fd.get("screenshotUrl") as string,
     };
 
-    const updated =
-      typeof editingId === "string"
-        ? projects.map((p) => (p.id === editingId ? projectData : p))
-        : [...projects, projectData];
-
+    const updated = editingId === "new" 
+      ? [...projects, project]
+      : projects.map(p => p.id === editingId ? project : p);
+    
     applyProjects(updated);
     setEditingId(null);
   };
 
-  const editingProject =
-    typeof editingId === "string" ? projects.find((p) => p.id === editingId) : null;
-  const showForm = editingId !== null;
-
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <SectionHeader title="Projects" />
-        {!showForm && (
-          <button
-            onClick={() => setEditingId(undefined)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 16px",
-              borderRadius: 10,
-              background: "#1a2340",
-              color: "#06b6d4",
-              border: "1px solid #232d4a",
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            <Plus size={15} /> Add Project
-          </button>
+        <h2 className="text-2xl font-bold tracking-tight">Projects</h2>
+        {!editingId && (
+          <Button onClick={() => setEditingId("new")} className="bg-white/10 hover:bg-white/20 text-white rounded-xl">
+            <Plus size={16} className="mr-2" /> Add Project
+          </Button>
         )}
       </div>
 
-      {isDirty && (
-        <div
-          style={{
-            background: "#fef3c7",
-            color: "#92400e",
-            padding: "8px 14px",
-            borderRadius: 8,
-            fontSize: 13,
-          }}
-        >
-          ⚠ Unsaved changes — click Save to persist
+      {editingId && (
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <h3 className="font-semibold text-lg">{editingId === "new" ? "New Project" : "Edit Project"}</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</label>
+                <Input name="title" defaultValue={projects.find(p => p.id === editingId)?.title || ""} required className="bg-black/50 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Description</label>
+                <Textarea name="description" defaultValue={projects.find(p => p.id === editingId)?.description || ""} className="bg-black/50 border-white/10 text-white h-24 rounded-xl focus:border-purple-500 resize-none" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tech Stack (comma separated)</label>
+                <Input name="techStack" defaultValue={projects.find(p => p.id === editingId)?.techStack?.join(", ") || ""} className="bg-black/50 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" placeholder="React, TypeScript, Tailwind" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Repo Link</label>
+                  <Input name="repoLink" defaultValue={projects.find(p => p.id === editingId)?.repoLink || ""} className="bg-black/50 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live Link</label>
+                  <Input name="liveLink" defaultValue={projects.find(p => p.id === editingId)?.liveLink || ""} className="bg-black/50 border-white/10 text-white h-12 rounded-xl focus:border-purple-500" />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+              <Button type="button" variant="ghost" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-white rounded-xl">Cancel</Button>
+              <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl">Save Project</Button>
+            </div>
+          </form>
         </div>
       )}
 
-      {showForm && (
-        <Card style={{ background: "#1a2340", border: "1px solid #232d4a" }}>
-          <CardContent className="pt-5">
-            <form key={String(editingId)} onSubmit={handleProjectSubmit} className="space-y-4">
-              <p className="text-sm font-medium" style={{ color: "#94a3b8" }}>
-                {editingProject ? `Editing: ${editingProject.title}` : "New Project"}
-              </p>
-              <Field label="Title *">
-                <Input name="title" defaultValue={editingProject?.title ?? ""} required placeholder="My Awesome Project" className="bg-black/40 border-white/10 text-white" />
-              </Field>
-              <Field label="Description">
-                <Textarea name="description" defaultValue={editingProject?.description ?? ""} placeholder="What does this project do?" className="bg-black/40 border-white/10 text-white" />
-              </Field>
-              <Field label="Tech Stack (comma-separated)">
-                <Input name="techStack" defaultValue={editingProject?.techStack?.join(", ") ?? ""} placeholder="React, Node.js, PostgreSQL" className="bg-black/40 border-white/10 text-white" />
-              </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Repo Link">
-                  <Input name="repoLink" defaultValue={editingProject?.repoLink ?? ""} placeholder="https://github.com/..." className="bg-black/40 border-white/10 text-white" />
-                </Field>
-                <Field label="Live Link">
-                  <Input name="liveLink" defaultValue={editingProject?.liveLink ?? ""} placeholder="https://myapp.com" className="bg-black/40 border-white/10 text-white" />
-                </Field>
+      {!editingId && projects.length > 0 && (
+        <div className="grid gap-4">
+          {projects.map((p) => (
+            <div key={p.id} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex justify-between group hover:border-white/20 transition-colors">
+              <div>
+                <h4 className="font-bold text-lg mb-1">{p.title}</h4>
+                <p className="text-sm text-gray-400 mb-3 line-clamp-2 max-w-xl">{p.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {p.techStack?.map((t: string) => (
+                    <span key={t} className="px-2.5 py-1 rounded-md bg-white/5 text-xs font-medium text-gray-300">{t}</span>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setEditingId(null)}
-                  style={{ background: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 13, padding: "8px 12px" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ background: "#232d4a", border: "1px solid #06b6d4", color: "#06b6d4", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-                >
-                  {editingProject ? "Update Project" : "Add Project"}
-                </button>
+              <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button size="icon" variant="ghost" onClick={() => setEditingId(p.id)} className="h-8 w-8 text-gray-400 hover:text-white"><Edit2 size={14} /></Button>
+                <Button size="icon" variant="ghost" onClick={() => applyProjects(projects.filter(pr => pr.id !== p.id))} className="h-8 w-8 text-gray-400 hover:text-red-400"><Trash2 size={14} /></Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {!editingId && projects.length === 0 && (
+        <div className="text-center py-12 border border-white/10 border-dashed rounded-2xl text-gray-500">
+          No projects added yet.
+        </div>
       )}
 
-      <div className="space-y-3">
-        {projects.map((p) => (
-          <div
-            key={p.id}
-            style={{ background: "#1a2340", border: "1px solid #232d4a", borderRadius: 12, padding: "14px 16px" }}
-            className="flex justify-between items-start"
-          >
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-base text-white">{p.title}</h3>
-              <p style={{ color: "#64748b", fontSize: 13, marginTop: 2 }} className="line-clamp-1">{p.description}</p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {p.techStack?.map((t: string) => (
-                  <span
-                    key={t}
-                    style={{ fontSize: 11, background: "#232d4a", color: "#06b6d4", padding: "2px 8px", borderRadius: 999 }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-1 shrink-0 ml-3">
-              <button
-                onClick={() => setEditingId(p.id)}
-                style={{ background: "transparent", border: "none", color: "#64748b", cursor: "pointer", padding: 6, borderRadius: 6 }}
-              >
-                <Edit2 size={15} />
-              </button>
-              <button
-                onClick={() => deleteProject(p.id)}
-                style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", padding: 6, borderRadius: 6 }}
-              >
-                <Trash2 size={15} />
-              </button>
-            </div>
-          </div>
-        ))}
-        {projects.length === 0 && !showForm && (
-          <div
-            style={{ border: "1px dashed #1e2a42", borderRadius: 12, padding: "40px 0", textAlign: "center", color: "#4b5563", fontSize: 14 }}
-          >
-            No projects yet — click "Add Project" to get started.
-          </div>
-        )}
-      </div>
-
-      <SaveButton status={saveStatus} onClick={handleSaveAll} label="Save All Projects" />
+      {!editingId && (
+        <div className="pt-8 sticky bottom-8 z-20">
+          <SaveButton status={saveStatus} onClick={handleSaveAll} label="Commit Project Changes" />
+        </div>
+      )}
     </div>
   );
 }
 
-// ─── SkillsForm ───────────────────────────────────────────────────────────────
-
 function SkillsForm({ user, setLocalData, updateSkills }: any) {
-  const formRef = useRef<HTMLFormElement>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const parseSkills = (str: string) =>
-    str.split(",").map((s) => s.trim()).filter(Boolean);
+  const getSkills = useCallback(() => {
+    const fd = new FormData(formRef.current!);
+    return {
+      frontend: (fd.get("frontend") as string).split(",").map(s => s.trim()).filter(Boolean),
+      backend: (fd.get("backend") as string).split(",").map(s => s.trim()).filter(Boolean),
+      devops: (fd.get("devops") as string).split(",").map(s => s.trim()).filter(Boolean),
+      other: (fd.get("other") as string).split(",").map(s => s.trim()).filter(Boolean),
+    };
+  }, []);
 
   const handleChange = () => {
-    const fd = new FormData(formRef.current!);
-    const skills = {
-      frontend: parseSkills(fd.get("frontend") as string),
-      backend: parseSkills(fd.get("backend") as string),
-      devops: parseSkills(fd.get("devops") as string),
-      other: parseSkills(fd.get("other") as string),
-    };
-    setLocalData((prev: any) => ({ ...prev, skills }));
+    setLocalData((prev: any) => ({ ...prev, skills: getSkills() }));
   };
 
   const handleSave = () => {
-    const fd = new FormData(formRef.current!);
-    const skills = {
-      frontend: parseSkills(fd.get("frontend") as string),
-      backend: parseSkills(fd.get("backend") as string),
-      devops: parseSkills(fd.get("devops") as string),
-      other: parseSkills(fd.get("other") as string),
-    };
     setSaveStatus("saving");
     updateSkills.mutate(
-      { data: { skills } },
+      { data: { skills: getSkills() } },
       {
-        onSuccess: () => {
-          setSaveStatus("saved");
-          setTimeout(() => setSaveStatus("idle"), 2000);
-        },
+        onSuccess: () => { setSaveStatus("saved"); setTimeout(() => setSaveStatus("idle"), 2000); },
         onError: () => setSaveStatus("error"),
       }
     );
   };
 
   return (
-    <form ref={formRef} onChange={handleChange} className="space-y-5 max-w-2xl">
-      <SectionHeader title="Skills" />
+    <form ref={formRef} onChange={handleChange} className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-2">Technical Skills</h2>
+        <p className="text-gray-400 mb-8">Comma separated values (e.g. React, Vue, Svelte)</p>
+        
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Frontend / Client</label>
+            <Textarea name="frontend" defaultValue={user.skills?.frontend?.join(", ") || ""} className="bg-white/5 border-white/10 text-white h-20 rounded-xl focus:border-purple-500 resize-none" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Backend / Core</label>
+            <Textarea name="backend" defaultValue={user.skills?.backend?.join(", ") || ""} className="bg-white/5 border-white/10 text-white h-20 rounded-xl focus:border-purple-500 resize-none" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Infrastructure / Data</label>
+            <Textarea name="devops" defaultValue={user.skills?.devops?.join(", ") || ""} className="bg-white/5 border-white/10 text-white h-20 rounded-xl focus:border-purple-500 resize-none" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tools / Other</label>
+            <Textarea name="other" defaultValue={user.skills?.other?.join(", ") || ""} className="bg-white/5 border-white/10 text-white h-20 rounded-xl focus:border-purple-500 resize-none" />
+          </div>
+        </div>
+      </div>
 
-      <Field label="Frontend (comma-separated)">
-        <Textarea name="frontend" defaultValue={user.skills?.frontend?.join(", ") || ""} className="bg-black/40 border-white/10 text-white h-20" placeholder="React, TypeScript, Tailwind CSS" />
-      </Field>
-      <Field label="Backend (comma-separated)">
-        <Textarea name="backend" defaultValue={user.skills?.backend?.join(", ") || ""} className="bg-black/40 border-white/10 text-white h-20" placeholder="Node.js, Express, PostgreSQL" />
-      </Field>
-      <Field label="DevOps (comma-separated)">
-        <Textarea name="devops" defaultValue={user.skills?.devops?.join(", ") || ""} className="bg-black/40 border-white/10 text-white h-20" placeholder="Docker, AWS, CI/CD" />
-      </Field>
-      <Field label="Other (comma-separated)">
-        <Textarea name="other" defaultValue={user.skills?.other?.join(", ") || ""} className="bg-black/40 border-white/10 text-white h-20" placeholder="Git, Figma, Agile" />
-      </Field>
-
-      <div className="pt-2">
-        <SaveButton status={saveStatus} onClick={handleSave} label="Save Skills" />
+      <div className="pt-4 sticky bottom-8 z-20">
+        <SaveButton status={saveStatus} onClick={handleSave} label="Update Skillset" />
       </div>
     </form>
   );
 }
 
-// ─── ThemeSelector ────────────────────────────────────────────────────────────
-
 function ThemeSelector({ currentTemplate, setLocalData, updateTemplate, toast }: any) {
-  const themes = [
-    { id: "minimalist", name: "Frontend Engineer", domain: "Frontend / Web", desc: "Dark glass + purple gradient hero, modern dev aesthetic", emoji: "⚡" },
-    { id: "corporate", name: "Backend Engineer", domain: "Backend / Systems", desc: "Structured enterprise look, clean white dashboard", emoji: "🏗️" },
-    { id: "data-science", name: "AI / ML Engineer", domain: "AI & Data Science", desc: "Terminal-style notebook, metrics & glowing data", emoji: "🤖" },
-    { id: "cyberpunk", name: "Cybersecurity", domain: "Security / Hacking", desc: "Matrix green, scanlines, hacker terminal vibes", emoji: "🔐" },
-    { id: "devops", name: "DevOps / Cloud", domain: "Infrastructure", desc: "CI/CD pipeline, orange accent, infra dashboard", emoji: "☁️" },
-    { id: "creative", name: "UI / UX Designer", domain: "Design / Creative", desc: "Pastel bento grid, Dribbble-inspired showcase", emoji: "🎨" },
-    { id: "student", name: "Student / Placement", domain: "Freshers & Campus", desc: "ATS-friendly, clean blue, stats cards & certs", emoji: "🎓" },
-    { id: "game-dev", name: "Game Developer", domain: "Indie / GameDev", desc: "8-bit pixel retro style, vibrant game aesthetic", emoji: "🎮" },
-  ];
+  const [active, setActive] = useState(currentTemplate || "minimal-universal");
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
-  const selectTheme = (id: string) => {
+  const handleSelect = (id: string) => {
+    setActive(id);
     setLocalData((prev: any) => ({ ...prev, templateId: id }));
+  };
+
+  const handleSave = () => {
+    setSaveStatus("saving");
     updateTemplate.mutate(
-      { data: { templateId: id } },
+      { data: { templateId: active } },
       {
-        onSuccess: () => toast({ title: "Template updated ✓" }),
-        onError: () => toast({ title: "Failed to update template", variant: "destructive" }),
+        onSuccess: () => { setSaveStatus("saved"); setTimeout(() => setSaveStatus("idle"), 2000); },
+        onError: () => setSaveStatus("error"),
       }
     );
   };
 
   return (
-    <div className="max-w-2xl">
-      <SectionHeader title="Choose Template" className="mb-6" />
-      <div className="grid grid-cols-2 gap-4">
-        {themes.map((t) => {
-          const isActive = currentTemplate === t.id;
-          return (
-            <div
-              key={t.id}
-              onClick={() => selectTheme(t.id)}
-              style={{
-                padding: "16px 18px",
-                borderRadius: 14,
-                cursor: "pointer",
-                border: isActive ? "2px solid #7c3aed" : "2px solid #1e2a42",
-                background: isActive ? "rgba(124,58,237,0.1)" : "#1a2340",
-                transition: "all 0.2s",
-              }}
-            >
-              <div className="flex items-start gap-3 mb-2">
-                <span style={{ fontSize: 22, lineHeight: 1 }}>{t.emoji}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-white text-sm">{t.name}</h3>
-                    {isActive && (
-                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7c3aed", flexShrink: 0 }} />
-                    )}
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-2">Aesthetic Configuration</h2>
+        <p className="text-gray-400 mb-8">Select a stream-specific template to completely transform your portfolio's appearance.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {TEMPLATE_OPTIONS.map((t) => {
+            const isSelected = active === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => handleSelect(t.id)}
+                className={`relative flex flex-col items-start p-6 rounded-2xl border text-left transition-all overflow-hidden group ${
+                  isSelected 
+                    ? "border-purple-500 bg-purple-500/10" 
+                    : "border-white/10 bg-white/5 hover:border-white/30"
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${t.previewColor} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                {isSelected && (
+                  <div className="absolute top-4 right-4 text-purple-400">
+                    <CheckCircle2 size={20} />
                   </div>
-                  <div style={{ fontSize: 11, color: "#06b6d4", marginTop: 2 }}>{t.domain}</div>
-                </div>
-              </div>
-              <p style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.5, paddingLeft: 34 }}>{t.desc}</p>
-            </div>
-          );
-        })}
+                )}
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">{t.category}</span>
+                <span className="text-lg font-bold text-white relative z-10">{t.name}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <p className="text-xs mt-6" style={{ color: "#4b5563" }}>
-        Template changes are saved automatically when you click a card.
-      </p>
-    </div>
-  );
-}
 
-// ─── Shared UI helpers ────────────────────────────────────────────────────────
-
-function SectionHeader({ title, className }: { title: string; className?: string }) {
-  return (
-    <h2 className={`text-lg font-semibold text-white ${className ?? ""}`}>{title}</h2>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-gray-400 text-xs font-medium uppercase tracking-wide">{label}</Label>
-      {children}
+      <div className="pt-4 sticky bottom-8 z-20">
+        <SaveButton status={saveStatus} onClick={handleSave} label="Apply Aesthetic" />
+      </div>
     </div>
   );
 }

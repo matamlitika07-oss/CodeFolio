@@ -1,0 +1,570 @@
+You are a senior full-stack SaaS engineer, UI/UX designer, and frontend architect.
+
+Upgrade and expand my existing web application called CodeFolio — a modern no-code portfolio builder platform for developers, designers, AI engineers, and creative professionals.
+
+IMPORTANT:
+This is NOT a new project.
+The existing authentication system, dashboard, backend APIs, and basic templates are already working.
+
+Your task is to:
+- improve the overall aesthetics,
+- add highly professional stream-specific templates,
+- add stream-specific portfolio input systems,
+- improve the dashboard UX,
+- improve live preview,
+- make the platform feel like a premium startup SaaS.
+
+====================================================
+MAIN GOAL
+====================================================
+
+Transform CodeFolio from:
+“basic portfolio builder”
+
+into:
+“premium multi-stream portfolio platform”
+
+The final product should feel comparable to:
+- Framer
+- Webflow
+- Behance
+- Dribbble
+- Vercel
+- Linear
+
+====================================================
+CURRENT STACK
+====================================================
+
+Frontend:
+- React.js (Vite)
+- React Router
+- React Hook Form
+- Context API
+- Plain CSS
+
+Backend:
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+
+====================================================
+IMPORTANT RULES
+====================================================
+
+1. Do NOT break existing APIs.
+2. Keep authentication system working.
+3. Keep current dashboard structure.
+4. Extend the existing schema cleanly.
+5. Existing portfolios must continue working.
+6. All new templates must be mobile responsive.
+7. Use smooth animations and modern UI polish.
+8. Maintain high performance.
+9. Avoid unnecessary heavy libraries.
+10. Every template must feel visually unique.
+
+====================================================
+GLOBAL UI/UX IMPROVEMENTS
+====================================================
+
+Apply these improvements across the entire app:
+
+1. Premium typography hierarchy
+- large modern headings
+- cleaner spacing
+- improved readability
+- modern font pairings
+
+2. Better animations
+- smooth transitions
+- fade-up animations
+- staggered reveals
+- hover interactions
+- floating effects
+- glow effects
+- micro-interactions
+
+3. Modern card design
+- glassmorphism
+- gradient borders
+- hover elevation
+- animated shadows
+- smooth hover transforms
+
+4. Better dashboard UX
+- cleaner sidebar
+- better tabs
+- improved spacing
+- smoother interactions
+- better responsive layouts
+
+5. Better Live Preview
+- fullscreen preview mode
+- desktop/mobile toggle
+- smooth live updates
+- realistic website preview
+- isolated preview styles
+
+6. Better template selection UI
+- animated template cards
+- hover preview effects
+- category labels
+- recommendation system
+
+====================================================
+TEMPLATE SYSTEM
+====================================================
+
+Instead of:
+“Choose Template”
+
+Use:
+“Choose Your Stream”
+
+Show stream-specific templates.
+
+====================================================
+ADD THESE STREAM-SPECIFIC TEMPLATES
+====================================================
+
+====================================================
+1. MINIMAL UNIVERSAL TEMPLATE
+====================================================
+
+Template Name:
+Minimal Universal
+
+Purpose:
+A clean universal portfolio for all professions.
+
+Target Users:
+- students
+- freshers
+- developers
+- professionals
+- recruiters
+
+Style:
+- Apple-inspired minimalism
+- Linear-inspired clean UI
+- elegant typography
+- modern spacing
+- dark premium aesthetic
+
+Colors:
+- black
+- white
+- purple accents
+
+Features:
+- elegant hero section
+- clean project cards
+- timeline section
+- responsive layout
+- ATS-friendly structure
+- modern typography
+- smooth animations
+
+====================================================
+2. FRONTEND DEVELOPER TEMPLATE
+====================================================
+
+Template Name:
+Frontend Pro
+
+Target Users:
+- React developers
+- Next.js developers
+- frontend engineers
+
+Style:
+- Framer-inspired
+- modern gradients
+- glassmorphism
+- interactive UI
+
+Features:
+- animated hero
+- floating UI cards
+- glowing buttons
+- animated project showcase
+- live website previews
+- smooth hover effects
+- stack badges
+
+====================================================
+3. FULL STACK DEVELOPER TEMPLATE
+====================================================
+
+Template Name:
+FullStack Nexus
+
+Target Users:
+- MERN developers
+- SaaS builders
+- startup engineers
+
+Features:
+- frontend/backend split
+- deployment section
+- architecture showcase
+- SaaS project cards
+- GitHub analytics
+- API showcase
+
+Style:
+- premium startup dashboard
+
+====================================================
+4. BACKEND DEVELOPER TEMPLATE
+====================================================
+
+Template Name:
+Backend Core
+
+Target Users:
+- backend developers
+- Java developers
+- Node.js engineers
+
+Features:
+- API cards
+- database architecture
+- deployment timeline
+- system design sections
+- terminal snippets
+- server architecture visualization
+
+Style:
+- enterprise dashboard aesthetic
+
+Colors:
+- navy
+- cyan
+- white
+- steel gray
+
+====================================================
+5. AI / ML ENGINEER TEMPLATE
+====================================================
+
+Template Name:
+AI Matrix
+
+Target Users:
+- AI engineers
+- ML engineers
+- data scientists
+- GenAI developers
+
+STYLE:
+- futuristic AI dashboard
+- neural network inspired
+- glowing data visuals
+
+Colors:
+- dark charcoal
+- neon blue
+- orange
+- purple
+
+AI/ML INPUT FIELDS:
+
+Projects:
+- Model Name
+- Problem Statement
+- Dataset Used
+- Accuracy / Metrics
+- Technologies Used
+- Research Paper Link
+- Kaggle Link
+- HuggingFace Link
+- GitHub Repo
+- Live Demo
+- Model Architecture
+- Training Images / Charts
+- Deployment Link
+
+Profile:
+- AI Specialization
+- Research Interests
+- Publications
+- Certifications
+- Kaggle Username
+- HuggingFace Profile
+- Google Scholar Link
+
+Skills:
+- ML Frameworks
+- Deep Learning
+- NLP
+- Computer Vision
+- Data Visualization
+- LLM Tools
+
+Visual Features:
+- animated particles
+- glowing metric cards
+- charts
+- neural animations
+- AI dashboard sections
+
+====================================================
+6. UI/UX DESIGNER TEMPLATE
+====================================================
+
+Template Name:
+Creative Studio
+
+Target Users:
+- UI designers
+- UX designers
+- product designers
+
+Style:
+- Behance + Dribbble inspired
+- bento grids
+- pastel glassmorphism
+- floating cards
+
+UI/UX INPUT FIELDS:
+
+Projects:
+- Case Study Title
+- Design Problem
+- User Research
+- Wireframes
+- Figma Link
+- Prototype Link
+- Design System Link
+- User Flow Images
+- Before/After Screens
+- Behance Link
+- Dribbble Link
+
+Profile:
+- Design Philosophy
+- Tools Used
+- Specialization
+- Years of Experience
+- Design Process
+
+Skills:
+- UI Design
+- UX Research
+- Wireframing
+- Prototyping
+- Motion Design
+- Typography
+- Branding
+
+Visual Features:
+- animated bento layouts
+- floating UI elements
+- glassmorphism cards
+- pastel gradients
+- animated galleries
+- creative transitions
+
+====================================================
+7. GRAPHIC DESIGNER TEMPLATE
+====================================================
+
+Template Name:
+DesignCanvas
+
+Target Users:
+- graphic designers
+- branding designers
+- illustrators
+
+Style:
+- artistic portfolio gallery
+- modern creative showcase
+
+GRAPHIC DESIGNER INPUT FIELDS:
+
+Projects:
+- Poster Images
+- Branding Showcase
+- Logo Designs
+- Illustration Gallery
+- Color Palette
+- Typography Used
+- Packaging Designs
+- Social Media Creatives
+- Photoshop File Link
+- Behance Link
+
+Profile:
+- Creative Style
+- Design Niche
+- Favorite Tools
+- Brand Collaborations
+
+Skills:
+- Photoshop
+- Illustrator
+- Branding
+- Typography
+- Illustration
+- Print Design
+- Visual Identity
+
+Visual Features:
+- masonry image gallery
+- fullscreen previews
+- hover zoom effects
+- smooth transitions
+- artistic typography
+- gallery animations
+
+====================================================
+8. CREATIVE DEVELOPER TEMPLATE
+====================================================
+
+Template Name:
+Creative Motion
+
+Target Users:
+- creative developers
+- WebGL developers
+- Three.js artists
+- interactive experience creators
+
+Style:
+- cinematic immersive portfolio
+- interactive modern visuals
+
+CREATIVE DEVELOPER INPUT FIELDS:
+
+Projects:
+- WebGL Demo
+- Three.js Project
+- Interactive Experience Link
+- GSAP Animation Link
+- Shader Demo
+- Motion Showcase
+- 3D Scene Preview
+- Experimental UI Demo
+- Audio Reactive Visuals
+- Creative Coding Project
+
+Profile:
+- Creative Coding Style
+- Favorite Libraries
+- Visual Experimentation Interests
+
+Skills:
+- Three.js
+- WebGL
+- GSAP
+- Framer Motion
+- GLSL
+- Interactive Design
+- Creative Coding
+
+Visual Features:
+- parallax scrolling
+- floating 3D cards
+- mouse reactive effects
+- cinematic transitions
+- animated backgrounds
+- immersive interactions
+
+====================================================
+9. GAME DEVELOPER TEMPLATE
+====================================================
+
+Template Name:
+PixelForge
+
+Target Users:
+- Unity developers
+- Unreal developers
+- indie game creators
+
+Style:
+- retro futuristic gaming UI
+
+Features:
+- gameplay trailers
+- achievement cards
+- XP bars
+- animated stars
+- retro hover effects
+- pixel-inspired UI
+
+Colors:
+- neon cyan
+- magenta
+- yellow
+- black
+
+====================================================
+DASHBOARD IMPROVEMENTS
+====================================================
+
+Improve the dashboard experience:
+
+1. Add stream selector during onboarding.
+
+2. Based on selected stream:
+- show recommended templates
+- show relevant fields only
+
+3. Add:
+- drag-and-drop project ordering
+- image upload support
+- gallery upload support
+- preview thumbnails
+- fullscreen preview mode
+
+4. Add:
+- desktop/tablet/mobile preview toggle
+
+5. Add:
+- animated save indicators
+- loading skeletons
+- smooth transitions
+
+====================================================
+PORTFOLIO FEATURES
+====================================================
+
+Add:
+- GitHub integration UI
+- social links
+- resume upload
+- contact forms
+- animated project showcase
+- responsive layouts
+- empty states
+- loading states
+
+====================================================
+FINAL GOAL
+====================================================
+
+The final platform should feel like:
+- Behance for designers
+- Dribbble for creatives
+- Framer for developers
+- Kaggle portfolio for AI engineers
+
+Every stream should have:
+- specialized inputs
+- specialized layouts
+- specialized aesthetics
+- premium modern UI
+- recruiter-ready presentation
+
+The final result should look:
+- startup quality
+- highly polished
+- visually immersive
+- modern
+- professional
+- production-ready
