@@ -18,7 +18,7 @@ import {
   Copy, ExternalLink, LogOut, Plus, Trash2, Edit2,
   Code2, Camera, Palette, Layers, CheckCircle2,
   MonitorSmartphone, LayoutTemplate, Terminal, Image, Star, Briefcase,
-  Award, ChevronRight, ArrowLeft, Users
+  Award, ChevronRight, ArrowLeft, Users, Maximize2, Minimize2, Eye
 } from "lucide-react";
 
 // ─── Stream Config ──────────────────────────────────────────────────────────
@@ -157,6 +157,7 @@ export default function DashboardPage() {
   const updateTemplate = useUpdateTemplate();
 
   const [localData, setLocalData] = useState<any>(null);
+  const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
 
   useEffect(() => {
     if (user && !localData) {
@@ -206,8 +207,27 @@ export default function DashboardPage() {
     );
   };
 
+  const isPhotographerStream = currentStream === "Photographer";
+
   return (
     <div className="h-screen flex bg-[#030303] text-white font-sans overflow-hidden">
+      {/* Fullscreen Preview Overlay (Photographer only) */}
+      {isFullscreenPreview && isPhotographerStream && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/8 bg-[#080808]">
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+              <Eye size={13} /> Full Preview — LensCraft
+            </span>
+            <button onClick={() => setIsFullscreenPreview(false)} className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+              <Minimize2 size={14} /> Exit Preview
+            </button>
+          </div>
+          <div className="flex-1 overflow-auto">
+            {TemplatePreview ? <TemplatePreview data={localData} /> : null}
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="w-[265px] shrink-0 border-r border-white/10 flex flex-col bg-[#080808]">
         <div className="p-5 flex-1 overflow-y-auto">
@@ -299,7 +319,7 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-[#030303]">
-        <div className="max-w-3xl mx-auto p-8 lg:p-10 pb-32">
+        <div className={`mx-auto p-8 lg:p-10 pb-32 ${isPhotographerStream ? "max-w-4xl" : "max-w-3xl"}`}>
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
 
@@ -359,18 +379,36 @@ export default function DashboardPage() {
       </main>
 
       {/* Live Preview */}
-      <aside className="hidden xl:flex flex-col w-[430px] border-l border-white/10 bg-[#000]">
-        <div className="p-4 border-b border-white/5">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Live Preview</span>
+      <aside className={`hidden xl:flex flex-col border-l border-white/10 bg-[#000] ${isPhotographerStream ? "w-[480px]" : "w-[430px]"}`}>
+        <div className="p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Live Preview</span>
+            {isPhotographerStream && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-400 font-semibold uppercase tracking-wider">LensCraft</span>
+            )}
+          </div>
+          {isPhotographerStream && (
+            <button
+              onClick={() => setIsFullscreenPreview(true)}
+              className="flex items-center gap-1.5 text-[10px] text-gray-600 hover:text-purple-400 transition-colors px-2 py-1 rounded-lg hover:bg-white/4"
+            >
+              <Maximize2 size={12} /> Fullscreen
+            </button>
+          )}
         </div>
         <div className="flex-1 overflow-hidden relative flex items-start justify-center bg-[#040404] p-4">
           <div
             className="w-full rounded-2xl overflow-hidden border border-white/8 shadow-2xl bg-black"
-            style={{ zoom: 0.55, transformOrigin: "top center", width: "100%", minWidth: 390, height: 844 }}
+            style={{ zoom: isPhotographerStream ? 0.48 : 0.55, transformOrigin: "top center", width: "100%", minWidth: 390, height: 844 }}
           >
             {TemplatePreview ? <TemplatePreview data={localData} /> : null}
           </div>
         </div>
+        {isPhotographerStream && (
+          <div className="p-3 border-t border-white/5 text-center">
+            <p className="text-[9px] text-gray-700 uppercase tracking-widest">Cinematic · Luxury · Immersive</p>
+          </div>
+        )}
       </aside>
     </div>
   );
@@ -670,6 +708,8 @@ function DesignerProfileForm({ user, localData, setLocalData, updateProfile }: a
 
 function PhotographerProfileForm({ user, localData, setLocalData, updateProfile }: any) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [coverPreview, setCoverPreview] = useState<string>(localData.profile?.coverImageUrl || "");
+  const [avatarPreview, setAvatarPreview] = useState<string>(localData.profile?.avatarUrl || "");
   const formRef = useRef<HTMLFormElement>(null);
 
   const readData = useCallback(() => {
@@ -680,6 +720,7 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
         name: fd.get("name") as string,
         bio: fd.get("bio") as string,
         avatarUrl: fd.get("avatarUrl") as string,
+        coverImageUrl: fd.get("coverImageUrl") as string,
         photographyStyle: fd.get("photographyStyle") as string,
         location: fd.get("location") as string,
         domain: "Photographer",
@@ -694,7 +735,11 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
   }, [localData.profile]);
 
   const handleChange = () => {
-    setLocalData((prev: any) => ({ ...prev, profile: readData().profile }));
+    const d = readData();
+    setLocalData((prev: any) => ({ ...prev, profile: d.profile }));
+    const fd = new FormData(formRef.current!);
+    setCoverPreview(fd.get("coverImageUrl") as string || "");
+    setAvatarPreview(fd.get("avatarUrl") as string || "");
   };
 
   const handleSave = () => {
@@ -706,37 +751,85 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
   };
 
   return (
-    <form ref={formRef} onChange={handleChange} className="space-y-10">
-      <div>
-        <h2 className="text-2xl font-bold mb-1 tracking-tight">Photographer Identity</h2>
-        <p className="text-gray-500 text-sm mb-8">Your profile shown in the cinematic hero section.</p>
-        <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-5">
-            <FormField label="Your Name">
-              <Input name="name" defaultValue={localData.profile?.name || ""} className={inputCls} placeholder="Alex Rivera" />
-            </FormField>
-            <FormField label="Photography Style">
-              <Input name="photographyStyle" defaultValue={localData.profile?.photographyStyle || ""} className={inputCls} placeholder="Portrait · Editorial · Wedding" />
-            </FormField>
-          </div>
-          <FormField label="Bio">
-            <Textarea name="bio" defaultValue={localData.profile?.bio || ""} className={`${textareaCls} h-24`} placeholder="Capturing raw emotion and cinematic moments..." />
-          </FormField>
-          <div className="grid grid-cols-2 gap-5">
-            <FormField label="Avatar URL">
-              <Input name="avatarUrl" defaultValue={localData.profile?.avatarUrl || ""} className={inputCls} placeholder="https://..." />
-            </FormField>
-            <FormField label="Location">
-              <Input name="location" defaultValue={localData.profile?.location || ""} className={inputCls} placeholder="New York, USA" />
-            </FormField>
+    <form ref={formRef} onChange={handleChange} className="space-y-0">
+      {/* Header */}
+      <div className="mb-10">
+        <div className="flex items-center gap-2 mb-2">
+          <Camera size={18} className="text-purple-400" />
+          <h2 className="text-2xl font-bold tracking-tight">Photographer Identity</h2>
+        </div>
+        <p className="text-gray-500 text-sm">Your profile shown in the cinematic hero section of your portfolio.</p>
+      </div>
+
+      {/* Hero / Cover Image — most prominent */}
+      <div className="mb-8">
+        <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d0d]"
+          style={{ height: coverPreview ? 200 : 130 }}>
+          {coverPreview ? (
+            <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-700">
+              <Camera size={28} strokeWidth={1} />
+              <span className="text-xs tracking-wider uppercase">Hero Background Image</span>
+            </div>
+          )}
+          {coverPreview && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          )}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <FieldLabel>Hero Background Image URL</FieldLabel>
+            <Input
+              name="coverImageUrl"
+              defaultValue={localData.profile?.coverImageUrl || ""}
+              className="mt-1.5 bg-black/60 backdrop-blur border-white/15 text-white h-10 rounded-xl focus:border-purple-500 placeholder:text-gray-600 text-sm"
+              placeholder="https://... (appears behind your name in the hero)"
+            />
           </div>
         </div>
       </div>
 
-      <div className={sectionCls}>
-        <h3 className="text-lg font-bold mb-5">Social & Contact</h3>
+      {/* Name + Style row */}
+      <div className="grid grid-cols-2 gap-5 mb-6">
+        <FormField label="Full Name">
+          <Input name="name" defaultValue={localData.profile?.name || ""} className={inputCls} placeholder="Alex Rivera" />
+        </FormField>
+        <FormField label="Photography Style">
+          <Input name="photographyStyle" defaultValue={localData.profile?.photographyStyle || ""} className={inputCls} placeholder="Portrait · Editorial · Wedding" />
+        </FormField>
+      </div>
+
+      {/* Bio */}
+      <div className="mb-6">
+        <FormField label="Bio">
+          <Textarea name="bio" defaultValue={localData.profile?.bio || ""} className={`${textareaCls} h-28`}
+            placeholder="Capturing raw emotion and cinematic moments. Based in New York, available worldwide." />
+        </FormField>
+      </div>
+
+      {/* Avatar + Location */}
+      <div className="grid grid-cols-2 gap-5 mb-2">
+        <div className="space-y-2">
+          <FieldLabel>Avatar / Profile Photo URL</FieldLabel>
+          <div className="flex gap-2 items-center">
+            {avatarPreview && (
+              <img src={avatarPreview} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-white/15 shrink-0" />
+            )}
+            <Input name="avatarUrl" defaultValue={localData.profile?.avatarUrl || ""} className={inputCls} placeholder="https://..." />
+          </div>
+        </div>
+        <FormField label="Location">
+          <Input name="location" defaultValue={localData.profile?.location || ""} className={inputCls} placeholder="New York, USA" />
+        </FormField>
+      </div>
+
+      {/* Social & Contact */}
+      <div className="pt-8 mt-8 border-t border-white/8 space-y-5">
+        <div>
+          <h3 className="text-sm font-bold text-white mb-1">Social & Contact</h3>
+          <p className="text-xs text-gray-600">Links shown in your hero and contact sections.</p>
+        </div>
         <div className="grid grid-cols-2 gap-5">
-          <FormField label="Instagram">
+          <FormField label="Instagram URL">
             <Input name="instagram" defaultValue={localData.profile?.socialLinks?.instagram || ""} className={inputCls} placeholder="https://instagram.com/..." />
           </FormField>
           <FormField label="Website">
@@ -751,7 +844,7 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
         </div>
       </div>
 
-      <div className="sticky bottom-8 z-20 pt-4">
+      <div className="sticky bottom-8 z-20 pt-8">
         <SaveButton status={saveStatus} onClick={handleSave} />
       </div>
     </form>

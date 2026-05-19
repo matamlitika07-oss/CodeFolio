@@ -1,0 +1,256 @@
+You are a senior SaaS UI/UX engineer and frontend architect.
+
+Fix and redesign ONLY the Photographer stream experience in my existing CodeFolio project.
+
+IMPORTANT:
+Do NOT break:
+
+* authentication
+* backend APIs
+* routing
+* existing database
+* other streams
+* dashboard logic
+
+ONLY improve:
+
+* photographer dashboard UX
+* photographer live preview
+* photographer portfolio layout
+* responsive structure
+* visual hierarchy
+* cinematic feel
+
+====================================================
+CURRENT PROBLEM
+===============
+
+The Photographer stream currently feels broken and cramped.
+
+Issues:
+
+* dashboard layout feels squeezed
+* live preview too small
+* form spacing inconsistent
+* photography UI feels like developer dashboard
+* not image-focused
+* preview not immersive
+* typography weak
+* sections poorly balanced
+
+The photography portfolio should feel:
+
+* cinematic
+* luxury
+* immersive
+* image-first
+* elegant
+* modern
+* premium
+
+====================================================
+MAIN GOAL
+=========
+
+Transform the Photographer stream into:
+a premium photography portfolio builder experience.
+
+The UI should feel inspired by:
+
+* Squarespace photography websites
+* Adobe Portfolio
+* Behance photography layouts
+* luxury editorial photography sites
+
+====================================================
+DASHBOARD REDESIGN
+==================
+
+Fix the photographer dashboard layout.
+
+====================================================
+LEFT SIDEBAR
+============
+
+Keep:
+
+* Identity
+* Photo Gallery
+* Services
+* Testimonials
+
+But redesign it:
+
+* cleaner spacing
+* modern icons
+* elegant typography
+* premium dark aesthetic
+* better active state
+* improved hover effects
+
+====================================================
+MAIN FORM AREA
+==============
+
+The form section must:
+
+* become wider
+* cleaner spacing
+* image-focused
+* better typography hierarchy
+
+Add:
+
+* proper section dividers
+* more breathing space
+* responsive 2-column layout
+* larger textarea fields
+* better alignment
+
+====================================================
+LIVE PREVIEW FIX
+================
+
+BIGGEST ISSUE:
+The live preview is too small and cramped.
+
+Fix it completely.
+
+====================================================
+NEW PREVIEW SYSTEM
+==================
+
+1. Increase preview width.
+2. Reduce dashboard clutter.
+3. Add fullscreen preview mode.
+4. Add responsive preview scaling.
+5. Make preview feel like a real photography website.
+
+====================================================
+PHOTOGRAPHY TEMPLATE REDESIGN
+=============================
+
+Template Name:
+LensCraft
+
+STYLE:
+
+* cinematic
+* luxury
+* dark elegant aesthetic
+* minimalist photography portfolio
+
+====================================================
+HERO SECTION
+============
+
+Make the hero section:
+
+* fullscreen height
+* dramatic typography
+* centered composition
+* immersive visual hierarchy
+
+Add:
+
+* cinematic background image support
+* soft dark overlay
+* elegant serif typography
+* smooth fade-in animation
+
+Typography inspiration:
+
+* Vogue
+* luxury editorial websites
+
+====================================================
+PHOTO GALLERY SECTION
+=====================
+
+MOST IMPORTANT SECTION.
+
+Implement:
+
+* masonry image grid
+* fullscreen lightbox
+* hover zoom effects
+* smooth image transitions
+* category filtering
+* cinematic spacing
+
+Images should dominate the layout.
+
+====================================================
+FORM INPUT IMPROVEMENTS
+=======================
+
+Improve these fields:
+
+* Photographer Name
+* Bio
+* Photography Style
+* Portfolio Images
+* Services
+* Testimonials
+* Instagram
+* Location
+
+Add:
+
+* image upload previews
+* gallery thumbnails
+* drag-and-drop upload
+* image reordering
+
+====================================================
+TYPOGRAPHY FIX
+==============
+
+Current typography feels weak.
+
+Use:
+
+* modern luxury serif headings
+* elegant sans-serif body text
+* proper spacing hierarchy
+
+====================================================
+RESPONSIVENESS
+==============
+
+Fix mobile layout:
+
+* stack preview below form
+* responsive gallery
+* better spacing
+* no overflow issues
+
+====================================================
+IMPORTANT RULES
+===============
+
+1. Do NOT rewrite entire architecture.
+2. Do NOT break developer stream.
+3. Do NOT break graphic designer stream.
+4. Only refactor photographer UI cleanly.
+5. Keep backend compatible.
+6. Keep existing APIs working.
+7. Use reusable components.
+8. Maintain performance.
+
+====================================================
+FINAL GOAL
+==========
+
+The Photographer stream should feel:
+
+* premium
+* cinematic
+* elegant
+* immersive
+* luxury photography website quality
+
+The final result should feel like:
+
+* a real photography portfolio platform
+* not a generic dashboard with image fields
