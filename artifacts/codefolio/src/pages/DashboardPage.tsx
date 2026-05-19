@@ -759,45 +759,41 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
   };
 
   return (
-    <form ref={formRef} onChange={handleChange} className="space-y-0">
+    <form ref={formRef} onChange={handleChange} className="space-y-6">
       {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-2 mb-2">
+      <div>
+        <div className="flex items-center gap-2 mb-1">
           <Camera size={18} className="text-purple-400" />
           <h2 className="text-2xl font-bold tracking-tight">Photographer Identity</h2>
         </div>
         <p className="text-gray-500 text-sm">Your profile shown in the cinematic hero section of your portfolio.</p>
       </div>
 
-      {/* Hero / Cover Image — most prominent */}
-      <div className="mb-8">
-        <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d0d]"
-          style={{ height: coverPreview ? 200 : 130 }}>
-          {coverPreview ? (
-            <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-700">
-              <Camera size={28} strokeWidth={1} />
-              <span className="text-xs tracking-wider uppercase">Hero Background Image</span>
-            </div>
-          )}
-          {coverPreview && (
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          )}
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <FieldLabel>Hero Background Image URL</FieldLabel>
-            <Input
-              name="coverImageUrl"
-              defaultValue={localData.profile?.coverImageUrl || ""}
-              className="mt-1.5 bg-black/60 backdrop-blur border-white/15 text-white h-10 rounded-xl focus:border-purple-500 placeholder:text-gray-600 text-sm"
-              placeholder="https://... (appears behind your name in the hero)"
-            />
+      {/* Hero Cover Image */}
+      <div className="space-y-2">
+        <FieldLabel>Hero Background Image URL</FieldLabel>
+        <Input
+          name="coverImageUrl"
+          defaultValue={localData.profile?.coverImageUrl || ""}
+          className={inputCls}
+          placeholder="https://... (fullscreen image behind your name)"
+        />
+        {coverPreview ? (
+          <div className="relative w-full h-40 rounded-xl overflow-hidden border border-white/10">
+            <img src={coverPreview} alt="Cover preview" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <span className="absolute bottom-2 left-3 text-[10px] text-white/50 uppercase tracking-wider font-semibold">Hero Preview</span>
           </div>
-        </div>
+        ) : (
+          <div className="w-full h-20 rounded-xl border border-dashed border-white/10 bg-white/2 flex items-center justify-center gap-2 text-gray-700">
+            <Camera size={16} strokeWidth={1.5} />
+            <span className="text-xs tracking-wide">Paste a URL above to preview your hero image</span>
+          </div>
+        )}
       </div>
 
-      {/* Name + Style row */}
-      <div className="grid grid-cols-2 gap-5 mb-6">
+      {/* Name + Style */}
+      <div className="grid grid-cols-2 gap-5">
         <FormField label="Full Name">
           <Input name="name" defaultValue={localData.profile?.name || ""} className={inputCls} placeholder="Alex Rivera" />
         </FormField>
@@ -807,20 +803,18 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
       </div>
 
       {/* Bio */}
-      <div className="mb-6">
-        <FormField label="Bio">
-          <Textarea name="bio" defaultValue={localData.profile?.bio || ""} className={`${textareaCls} h-28`}
-            placeholder="Capturing raw emotion and cinematic moments. Based in New York, available worldwide." />
-        </FormField>
-      </div>
+      <FormField label="Bio">
+        <Textarea name="bio" defaultValue={localData.profile?.bio || ""} className={`${textareaCls} h-28`}
+          placeholder="Capturing raw emotion and cinematic moments. Based in New York, available worldwide." />
+      </FormField>
 
       {/* Avatar + Location */}
-      <div className="grid grid-cols-2 gap-5 mb-2">
+      <div className="grid grid-cols-2 gap-5">
         <div className="space-y-2">
           <FieldLabel>Avatar / Profile Photo URL</FieldLabel>
           <div className="flex gap-2 items-center">
             {avatarPreview && (
-              <img src={avatarPreview} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-white/15 shrink-0" />
+              <img src={avatarPreview} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-white/15 shrink-0" onError={() => setAvatarPreview("")} />
             )}
             <Input name="avatarUrl" defaultValue={localData.profile?.avatarUrl || ""} className={inputCls} placeholder="https://..." />
           </div>
@@ -831,9 +825,9 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
       </div>
 
       {/* Social & Contact */}
-      <div className="pt-8 mt-8 border-t border-white/8 space-y-5">
+      <div className="pt-6 border-t border-white/8 space-y-5">
         <div>
-          <h3 className="text-sm font-bold text-white mb-1">Social & Contact</h3>
+          <h3 className="text-sm font-semibold text-white mb-0.5">Social & Contact</h3>
           <p className="text-xs text-gray-600">Links shown in your hero and contact sections.</p>
         </div>
         <div className="grid grid-cols-2 gap-5">
@@ -852,7 +846,7 @@ function PhotographerProfileForm({ user, localData, setLocalData, updateProfile 
         </div>
       </div>
 
-      <div className="sticky bottom-8 z-20 pt-8">
+      <div className="sticky bottom-8 z-20 pt-2">
         <SaveButton status={saveStatus} onClick={handleSave} />
       </div>
     </form>
