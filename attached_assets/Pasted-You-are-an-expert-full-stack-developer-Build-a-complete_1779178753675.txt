@@ -1,0 +1,355 @@
+You are an expert full-stack developer. Build a complete web application called **CodeFolio** — a no-code portfolio builder for developers. Think "Linktree meets Squarespace, but built for engineers."
+
+## TECH STACK
+- Frontend: React.js (Vite), React Router v6, React Hook Form, React Helmet
+- Backend: Node.js + Express.js
+- Database: MongoDB + Mongoose
+- Email: Nodemailer (mock with console.log if no SMTP)
+- Styling: Plain CSS with CSS variables (no Tailwind, no Bootstrap)
+- Auth: JWT-based (email + password), token in localStorage
+
+## PROJECT STRUCTURE
+codefolio/
+├── client/
+│   └── src/
+│       ├── pages/
+│       │   ├── LandingPage.jsx
+│       │   ├── LoginPage.jsx
+│       │   ├── RegisterPage.jsx
+│       │   ├── DashboardPage.jsx
+│       │   └── PublicPortfolioPage.jsx
+│       ├── components/
+│       │   ├── forms/
+│       │   │   ├── ProfileForm.jsx
+│       │   │   ├── ProjectForm.jsx
+│       │   │   └── SkillsForm.jsx
+│       │   ├── preview/
+│       │   │   └── LivePreview.jsx
+│       │   └── templates/
+│       │       ├── templateMap.js
+│       │       ├── MinimalistTemplate.jsx
+│       │       ├── CyberpunkTemplate.jsx
+│       │       ├── CorporateTemplate.jsx
+│       │       ├── CreativeTemplate.jsx
+│       │       ├── DataScienceTemplate.jsx
+│       │       └── GameDevTemplate.jsx
+│       ├── context/AuthContext.jsx
+│       └── App.jsx
+└── server/
+    ├── models/
+    │   └── User.js
+    ├── routes/
+    │   ├── auth.js
+    │   ├── portfolio.js
+    │   └── public.js
+    ├── middleware/authMiddleware.js
+    └── index.js
+
+## PHASE 1: DATABASE MODEL
+
+### server/models/User.js
+Single User model with everything embedded:
+{
+  username: { type: String, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
+  password: String, // bcrypt hashed
+  templateId: { type: String, default: 'minimalist' },
+  contactEmail: String, // private, for contact form forwarding
+  profile: {
+    name: String,
+    bio: String,
+    avatarUrl: String,
+    resumeUrl: String,
+    domain: String, // 'frontend','backend','fullstack','devops','data-science','game-dev','mobile'
+    socialLinks: {
+      github: String,
+      linkedin: String,
+      twitter: String,
+      website: String
+    }
+  },
+  projects: [{
+    title: String,
+    description: String,
+    techStack: [String],
+    repoLink: String,
+    liveLink: String,
+    screenshotUrl: String
+  }],
+  skills: {
+    frontend: [String],
+    backend: [String],
+    devops: [String],
+    other: [String]
+  }
+}
+
+## PHASE 2: BACKEND API
+
+### server/index.js
+- Express app, connect to MongoDB via MONGODB_URI env var
+- CORS enabled for localhost:5173
+- Mount routes: /api/auth, /api/portfolio, /api/public
+- Listen on PORT env var or 5000
+
+### server/middleware/authMiddleware.js
+- Verify JWT from Authorization: Bearer <token> header
+- Attach decoded user id to req.userId
+- Return 401 if missing or invalid
+
+### server/routes/auth.js
+POST /api/auth/register
+  - Validate username, email, password present
+  - Check username and email not already taken
+  - Hash password with bcrypt (saltRounds: 10)
+  - Create and save User
+  - Return JWT signed with JWT_SECRET (expires in 7d) and { username, email }
+
+POST /api/auth/login
+  - Find user by email
+  - Compare password with bcrypt
+  - Return JWT and { username, email }
+
+### server/routes/portfolio.js (all routes protected by authMiddleware)
+GET /api/portfolio/me
+  - Return full user object (exclude password)
+
+PUT /api/portfolio/profile
+  - Body: profile fields + contactEmail + templateId
+  - Update and return saved user
+
+PUT /api/portfolio/projects
+  - Body: { projects: [...] }
+  - Replace projects array and save
+
+PUT /api/portfolio/skills
+  - Body: { skills: { frontend, backend, devops, other } }
+  - Replace skills and save
+
+PUT /api/portfolio/template
+  - Body: { templateId }
+  - Update templateId and save
+
+POST /api/portfolio/contact/:username
+  - Body: { senderName, senderEmail, message }
+  - Find user by username
+  - Use Nodemailer (transporter with EMAIL_USER, EMAIL_PASS env vars) to send email to user.contactEmail
+  - If no SMTP configured, console.log the message instead
+  - Never return contactEmail in response
+  - Return { success: true }
+
+### server/routes/public.js
+GET /api/public/:username
+  - Find user by username
+  - If not found return 404
+  - Return user data excluding password and contactEmail
+
+## PHASE 3: REACT FRONTEND
+
+### client/src/context/AuthContext.jsx
+- Store token and user info in localStorage
+- Provide login(token, user), logout(), isAuthenticated, user, token
+- Wrap entire app
+
+### client/src/App.jsx
+Routes:
+- / → LandingPage
+- /login → LoginPage
+- /register → RegisterPage
+- /dashboard → DashboardPage (protected, redirect to /login if not authenticated)
+- /:username → PublicPortfolioPage
+
+### client/src/pages/LandingPage.jsx
+Design a stunning landing page:
+- Hero: Large headline "Build your dev portfolio in 60 seconds", subtext, two CTAs: "Get Started Free" → /register and "See Example" → /demo
+- Features section: 3 cards — "No Coding Required", "6 Professional Templates", "Instant Public URL"
+- Template showcase: Grid of 6 template preview cards showing name, domain tag, and a short description
+- Footer with logo and links
+- Use a bold dark theme with gradient accents
+
+### client/src/pages/LoginPage.jsx and RegisterPage.jsx
+- Clean centered card forms
+- React Hook Form for validation
+- On success: save token to AuthContext, redirect to /dashboard
+- Link between the two pages
+
+### client/src/pages/DashboardPage.jsx
+Split layout — left panel (500px wide) and right panel (flex-fill):
+
+LEFT PANEL — Tabbed CMS:
+Tab 1: Profile
+  - React Hook Form fields: Full Name, Bio (textarea), Avatar URL, Resume URL, Domain (select dropdown with options: Frontend, Backend, Fullstack, DevOps, Data Science, Game Dev, Mobile), GitHub URL, LinkedIn URL, Twitter URL, Personal Website URL, Contact Email (private)
+  - On change: auto-save to API after 1 second debounce OR explicit Save button
+  - Show "Saving..." / "Saved ✓" status
+
+Tab 2: Projects
+  - List of project cards with Edit/Delete
+  - Add Project button opens inline form: Title, Description, Tech Stack (comma-separated input), Repo Link, Live Link, Screenshot URL
+  - Save updates entire projects array to API
+
+Tab 3: Skills
+  - 4 labeled textarea inputs: Frontend Skills, Backend Skills, DevOps Skills, Other Skills
+  - Each is comma-separated, displayed as tag chips preview below each input
+  - Save updates skills to API
+
+Tab 4: Choose Theme
+  - Grid of 6 template cards showing template name, domain label, short description
+  - Clicking one highlights it and calls PUT /api/portfolio/template
+  - Current active template is highlighted with a colored border
+
+TOP OF DASHBOARD:
+  - Show public URL: codefolio.app/{username} with a Copy button
+  - View Live button that opens /:username in new tab
+
+RIGHT PANEL — LivePreview:
+  - Use React Hook Form's watch() to get real-time form values
+  - Render chosen template component inside a scaled iframe-like container: CSS transform scale(0.55), overflow hidden, border, pointer-events: none
+  - Updates live as user types
+  - Show selected template name above preview
+
+### client/src/pages/PublicPortfolioPage.jsx
+- Fetch GET /api/public/:username on mount
+- Show loading spinner while fetching
+- If 404, show "Portfolio not found" page
+- Import templateMap, resolve: const Layout = templateMap[data.templateId] || MinimalistTemplate
+- Render <Layout data={userData} />
+- React Helmet: <title>{name} | CodeFolio</title> and <meta name="description" content={bio} />
+
+## PHASE 4: THE 6 TEMPLATES
+
+Each template receives a single prop: data (the full user object).
+Each template must render all sections: Hero/Header, About/Bio, Projects Grid, Skills Section, Contact Form.
+
+Contact form in each template:
+- Fields: Your Name, Your Email, Message
+- POST to /api/portfolio/contact/:username
+- Show success message on submit
+
+### templateMap.js
+export const templateMap = {
+  minimalist: MinimalistTemplate,
+  cyberpunk: CyberpunkTemplate,
+  corporate: CorporateTemplate,
+  creative: CreativeTemplate,
+  'data-science': DataScienceTemplate,
+  'game-dev': GameDevTemplate,
+};
+export default templateMap;
+
+### MinimalistTemplate.jsx — For Frontend / React Developers
+Visual style:
+- Pure white #ffffff background, ink black #111111 text
+- Font: 'JetBrains Mono' from Google Fonts for everything
+- Thin 1px #e0e0e0 horizontal rules as section dividers
+- Zero decorative elements, only typography and whitespace
+- Navigation: horizontal inline links, no background, just text
+- Hero: left-aligned, large name in bold monospace, small role tag
+- Project cards: simple bordered rectangles, no shadows, no rounded corners
+- Skills: plain comma-separated text lists per category, labeled
+- Max-width 800px centered content
+
+### CyberpunkTemplate.jsx — For Blockchain / Web3 / Hacker Developers
+Visual style:
+- Background: #0a0a0a with subtle scanline overlay (CSS repeating-linear-gradient)
+- Primary accent: #00ff41 (matrix green), secondary: #ff0080 (hot pink)
+- Font: 'Share Tech Mono' from Google Fonts
+- Hero name: CSS glitch animation (use @keyframes with clip-path or text-shadow displacement)
+- Bio: typewriter CSS animation
+- Project cards: neon green border, pink glow box-shadow on hover, dark bg
+- Skills: pill badges with neon green border and glow
+- Section headings prefixed with > like a terminal prompt
+- Horizontal neon line dividers
+
+### CorporateTemplate.jsx — For Backend / Enterprise Developers
+Visual style:
+- Colors: navy #1a2744, white #ffffff, gold #f0b429
+- Font: 'Playfair Display' for headings, 'Lato' for body (both Google Fonts)
+- Layout: two-column — narrow left sidebar (240px, navy bg) with avatar, name, contact info, skills; wide right main area with bio and projects
+- Left sidebar text in white, right content in dark on white
+- Project cards: white cards with subtle box-shadow, gold left-border accent
+- Skills in left sidebar: category label + simple list
+- Professional, structured, formal feel
+- Timeline dots next to projects
+
+### CreativeTemplate.jsx — For UI/UX Designers who code / Creative Developers
+Visual style:
+- Background: animated gradient mesh (CSS animation rotating hue on gradient)
+- Colors: pastels — pink #ffb3c1, lavender #c8b6ff, mint #b5ead7
+- Font: 'Pacifico' for name/logo, 'Nunito' for body (Google Fonts)
+- Layout: asymmetric bento grid for projects section
+- Project cards: large border-radius 24px, frosted glass effect (backdrop-filter blur + rgba bg), playful colored shadows
+- Skills: bubble/pill chips with pastel backgrounds, slightly rotated randomly
+- Hero: centered with large avatar in circle, animated floating effect (CSS keyframes translateY)
+- Sections have wavy SVG dividers between them
+
+### DataScienceTemplate.jsx — For ML / AI / Data Scientists
+Visual style:
+- Background: dark charcoal #1e1e2e
+- Accent: amber/orange #f97316, secondary: #38bdf8 (light blue)
+- Font: 'IBM Plex Mono' from Google Fonts
+- Hero: show 3 stat boxes prominently — Projects: N, Skills: N, GitHub Stars: (from data or static)
+- Bio in a styled code comment block: /* bio text here */
+- Project cards: dark #2a2a3e bg, left orange border, monospace title, tag chips in blue
+- Skills: displayed in a grid table with category as column headers
+- Section dividers: orange dashed lines
+- Skill chips styled like syntax highlighted tokens
+
+### GameDevTemplate.jsx — For Unity / Unreal / Indie Game Developers
+Visual style:
+- Background: #0d0d0d with CSS animated star field (small white dots twinkling via keyframes)
+- Font: 'Press Start 2P' from Google Fonts (pixelated, 8-bit)
+- All borders use pixel-art box-shadow trick: box-shadow: 4px 0 0 #fff, -4px 0 0 #fff, 0 4px 0 #fff, 0 -4px 0 #fff for hard pixel edges
+- Colors: retro palette — cyan #00ffff, yellow #ffff00, magenta #ff00ff, green #00ff00
+- Hero: Name displayed as if it's a game title screen, blinking cursor animation
+- Projects displayed as achievement cards or game cartridges with pixel borders
+- Skills displayed as HP/XP progress bars — each skill as a bar that fills to a percentage (use index/total * 100 or fixed 80%)
+- Section titles look like game UI headers [=== PROJECTS ===]
+- Hover on project cards: retro color invert effect
+
+## PHASE 5: ADDITIONAL REQUIREMENTS
+
+1. All API calls use fetch() with Authorization: Bearer ${token} header for protected routes
+2. Create a reusable api.js helper: export const api = (endpoint, options, token) => fetch('/api' + endpoint, { ...options, headers: { 'Content-Type': 'application/json', ...(token && { Authorization: 'Bearer ' + token }) } })
+3. Dashboard protected route: if no token in AuthContext, redirect to /login
+4. Responsive: all templates mobile-friendly with @media (max-width: 768px) — stack sidebar layouts, reduce font sizes, make project grids single column
+5. Loading states: show spinner or skeleton on data fetch
+6. Empty states: if no projects, show "No projects yet — add some in your dashboard!" styled per template aesthetic
+7. Error handling: show user-friendly error messages on all form submissions
+8. All 6 Google Fonts loaded via <link> tags in index.html — JetBrains Mono, Share Tech Mono, Playfair Display, Lato, Pacifico, Nunito, IBM Plex Mono, Press Start 2P
+
+## ENVIRONMENT VARIABLES
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=supersecretkey
+EMAIL_USER=your@gmail.com
+EMAIL_PASS=your_app_password
+PORT=5000
+
+## ROOT package.json scripts
+{
+  "scripts": {
+    "install-all": "npm install && cd client && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server/index.js",
+    "client": "cd client && npm run dev"
+  }
+}
+
+## IMPLEMENTATION ORDER — build completely in this sequence:
+1. Root package.json with concurrently, server/index.js, MongoDB connection
+2. server/models/User.js
+3. server/middleware/authMiddleware.js
+4. server/routes/auth.js (register + login fully working)
+5. server/routes/portfolio.js (all 5 endpoints)
+6. server/routes/public.js
+7. client/ Vite React setup, install react-router-dom react-hook-form react-helmet
+8. client/src/context/AuthContext.jsx
+9. client/src/App.jsx with all routes
+10. LoginPage.jsx and RegisterPage.jsx (fully working with API calls)
+11. DashboardPage.jsx with all 4 tabs and LivePreview
+12. All 6 template components (fully styled, all sections)
+13. templateMap.js
+14. PublicPortfolioPage.jsx with templateMap rendering and React Helmet
+15. LandingPage.jsx
+16. Polish: loading states, empty states, error messages, mobile responsiveness
+
+Write every file completely with full working code. No placeholder comments like "// implement this later". Every component, every route, every style must be production-ready and complete. Start with server/index.js and proceed in the order listed.
