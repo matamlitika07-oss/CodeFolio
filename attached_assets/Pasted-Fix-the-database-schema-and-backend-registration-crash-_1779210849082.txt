@@ -1,0 +1,101 @@
+Fix the database schema and backend registration crash in my existing CodeFolio project.
+
+CURRENT ERROR:
+HTTP 500 Internal Server Error during registration.
+
+The backend error shows:
+
+Failed query:
+select "id", "username", "email",
+"password_hash", "template_id",
+"contact_email", "profile"
+
+This means backend is querying database columns that do NOT exist.
+
+====================================================
+TASK
+====================================================
+
+Debug and fix the database schema mismatch WITHOUT breaking the existing website.
+
+====================================================
+IMPORTANT
+====================================================
+
+This is an existing working project.
+
+Do NOT rebuild the app.
+Do NOT redesign frontend.
+Do NOT remove authentication.
+
+ONLY fix:
+- database schema mismatch
+- registration crash
+- backend query errors
+
+====================================================
+CHECK DATABASE
+====================================================
+
+Inspect the users table schema.
+
+Ensure all required columns exist.
+
+Missing columns likely include:
+- template_id
+- contact_email
+- profile
+- stream_type
+
+====================================================
+FIX DATABASE SCHEMA
+====================================================
+
+Update the database schema safely.
+
+If using:
+- Drizzle ORM → run proper schema push
+- Prisma → run migration
+- PostgreSQL → alter table safely
+
+DO NOT delete existing users/data.
+
+Use safe migrations.
+
+====================================================
+ENSURE USERS TABLE CONTAINS
+====================================================
+
+- id
+- username
+- email
+- password_hash
+- template_id
+- contact_email
+- profile
+- stream_type
+- created_at
+
+====================================================
+BACKEND FIXES
+====================================================
+
+Ensure backend registration query matches actual schema.
+
+Fix:
+- incorrect column names
+- outdated queries
+- broken inserts/selects
+
+====================================================
+ERROR HANDLING
+====================================================
+
+Do NOT return HTML error pages.
+
+Return proper JSON errors:
+
+```js
+res.status(500).json({
+  message: 'Server error'
+})
