@@ -1,0 +1,150 @@
+Redesign the DashboardPage.jsx sidebar navigation and add proper Save buttons to match this exact UI design:
+
+## FIX 1: Left Sidebar Navigation — match this design exactly
+
+The left panel should look like this:
+
+TOP SECTION (user card):
+- Dark card background (#1e2235 or similar dark navy)
+- Circular avatar with initials fallback (gradient purple circle, white letter)
+- User's full name in white, bold
+- Username below in muted color prefixed with @
+- Progress bar below: label "Profile completion" on left, percentage on right
+- Progress bar: thin, rounded, purple/violet fill (#7c3aed) on dark track
+- All inside a rounded card with padding
+
+NAVIGATION MENU (below the card, separate rounded card):
+- Each nav item is a full-width row with: icon on left, label text, no border
+- Icons: Person icon for Profile, Grid/Dashboard icon for Projects, Wrench icon for Skills, Palette icon for Template
+- Default state: dark background, muted white text
+- Active/selected state: highlighted background (slightly lighter dark, e.g. #2a3150), accent cyan/teal text (#06b6d4 or similar), colored icon
+- Smooth hover effect: slight background lighten
+- No underlines, no borders between items
+- Rounded corners on active item highlight
+- Sufficient padding (12px 16px per item)
+
+Use these exact SVG inline icons (no icon library needed):
+- Profile: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+- Projects: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+- Skills: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+- Template: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+
+## FIX 2: Profile completion calculation
+Calculate profile completion percentage dynamically:
+
+const calculateCompletion = (userData) => {
+  const checks = [
+    userData?.profile?.name,
+    userData?.profile?.bio,
+    userData?.profile?.avatarUrl,
+    userData?.profile?.socialLinks?.github,
+    userData?.profile?.socialLinks?.linkedin,
+    userData?.projects?.length > 0,
+    userData?.skills?.frontend?.length > 0,
+    userData?.templateId && userData?.templateId !== 'minimalist'
+  ];
+  const filled = checks.filter(Boolean).length;
+  return Math.round((filled / checks.length) * 100);
+};
+
+Show this percentage in the sidebar and animate the progress bar width with CSS transition.
+
+## FIX 3: Add Save buttons to ALL tabs
+
+### Profile Tab — Save Button
+- Place a prominent Save Profile button at the bottom of the profile form
+- Style: full-width, rounded, gradient background (purple to cyan: linear-gradient(135deg, #7c3aed, #06b6d4))
+- White bold text, 14px, padding 12px
+- onClick handler:
+  const saveProfile = async (formData) => {
+    setSaveStatus('saving');
+    try {
+      await api('/portfolio/profile', {
+        method: 'PUT',
+        body: JSON.stringify(formData)
+      }, token);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch(err) {
+      setSaveStatus('error');
+    }
+  };
+- Button text changes based on saveStatus state:
+  - 'idle': "Save Profile"
+  - 'saving': "Saving..." (with spinner)
+  - 'saved': "✓ Saved!" (green tint)
+  - 'error': "Failed — Retry"
+
+### Projects Tab — Save Button
+- After the Add Project form, show a "Save All Projects" button with same styling
+- Also show individual project cards above the form with:
+  - Project title and tech stack chips
+  - Red "Remove" button (small, top-right of card)
+- When a project is added or removed, show an unsaved changes banner:
+  <div style="background: #fef3c7; color: #92400e; padding: 8px 12px; borderRadius: 8px; fontSize: 13px">
+    ⚠ Unsaved changes — click Save to persist
+  </div>
+- Save button calls PUT /api/portfolio/projects with full projects array
+
+### Skills Tab — Save Button
+- Same Save button at bottom of skills form
+- Calls PUT /api/portfolio/skills
+- Same saveStatus state pattern as profile
+
+### Template Tab — Auto-save on click
+- When user clicks a template card, immediately call PUT /api/portfolio/template
+- Show a small toast notification bottom-right: "Template updated ✓" fades in and out
+- No separate save button needed for this tab
+
+## FIX 4: Save Status Toast Component
+Add a reusable toast notification:
+
+const Toast = ({ message, type }) => (
+  <div style={{
+    position: 'fixed',
+    bottom: '24px',
+    right: '24px',
+    background: type === 'success' ? '#065f46' : '#7f1d1d',
+    color: 'white',
+    padding: '12px 20px',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: '500',
+    zIndex: 9999,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+    animation: 'fadeInUp 0.3s ease'
+  }}>
+    {type === 'success' ? '✓ ' : '✗ '}{message}
+  </div>
+);
+
+Add CSS keyframe:
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+## FIX 5: Overall Dashboard Layout CSS
+
+Left sidebar: width 280px, min-height 100vh, background #0f1629, padding 16px, display flex flex-direction column gap 12px
+
+User card: background #1a2340, border-radius 16px, padding 20px
+Avatar circle: width 48px height 48px, border-radius 50%, background linear-gradient(135deg, #7c3aed, #06b6d4), display flex align-items center justify-content center, color white, font-weight bold, font-size 18px
+Name: color #f1f5f9, font-size 16px, font-weight 600, margin 0
+Username: color #64748b, font-size 13px, margin 0
+
+Progress bar container: margin-top 12px
+Progress bar label row: display flex justify-content space-between, font-size 12px, color #94a3b8, margin-bottom 6px
+Progress track: height 6px, background #2d3748, border-radius 999px, overflow hidden
+Progress fill: height 100%, border-radius 999px, background linear-gradient(90deg, #7c3aed, #06b6d4), transition width 0.5s ease
+
+Nav card: background #1a2340, border-radius 16px, padding 8px, display flex flex-direction column gap 2px
+
+Nav item: display flex align-items center gap 12px, padding 10px 14px, border-radius 10px, cursor pointer, color #94a3b8, font-size 14px, font-weight 500, transition all 0.2s
+Nav item icon: width 18px height 18px, flex-shrink 0
+Nav item active: background #232d4a, color #06b6d4
+Nav item hover: background #1e2a42
+
+Right content area: flex 1, padding 24px, overflow-y auto, background #0a0f1e
+
+Apply all fixes. The result should exactly match the sidebar screenshot provided — dark navy theme, user card at top with avatar initials + progress bar, clean icon nav below with active cyan highlight — plus working Save buttons with status feedback on every tab.
