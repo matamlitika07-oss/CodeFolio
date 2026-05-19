@@ -210,7 +210,7 @@ export default function DashboardPage() {
   const isPhotographerStream = currentStream === "Photographer";
 
   return (
-    <div className="h-screen flex bg-[#030303] text-white font-sans overflow-hidden">
+    <div className="h-screen flex bg-[#030303] text-white font-sans" style={{ overflow: 'hidden', contain: 'strict' }}>
       {/* Fullscreen Preview Overlay (Photographer only) */}
       {isFullscreenPreview && isPhotographerStream && (
         <div className="fixed inset-0 z-50 bg-black flex flex-col">
@@ -229,8 +229,8 @@ export default function DashboardPage() {
       )}
 
       {/* Sidebar */}
-      <aside className="w-[265px] shrink-0 border-r border-white/10 flex flex-col bg-[#080808]">
-        <div className="p-5 flex-1 overflow-y-auto">
+      <aside className="w-[260px] shrink-0 min-w-[260px] border-r border-white/10 flex flex-col bg-[#080808] overflow-hidden">
+        <div className="p-5 flex-1 overflow-y-auto min-h-0">
           <div className="flex items-center gap-2 mb-7 text-white/90">
             <Code2 className="w-5 h-5 text-purple-500" />
             <span className="font-bold tracking-tight">CodeFolio</span>
@@ -318,8 +318,8 @@ export default function DashboardPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[#030303]">
-        <div className={`mx-auto p-8 lg:p-10 pb-32 ${isPhotographerStream ? "max-w-4xl" : "max-w-3xl"}`}>
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-[#030303]">
+        <div className="max-w-3xl mx-auto p-8 lg:p-10 pb-32 min-w-0">
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
 
@@ -379,8 +379,8 @@ export default function DashboardPage() {
       </main>
 
       {/* Live Preview */}
-      <aside className={`hidden xl:flex flex-col border-l border-white/10 bg-[#000] ${isPhotographerStream ? "w-[480px]" : "w-[430px]"}`}>
-        <div className="p-4 border-b border-white/5 flex items-center justify-between">
+      <aside className="hidden xl:flex flex-col w-[420px] shrink-0 min-w-[420px] border-l border-white/10 bg-[#000]">
+        <div className="h-[49px] shrink-0 px-4 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Live Preview</span>
             {isPhotographerStream && (
@@ -396,16 +396,24 @@ export default function DashboardPage() {
             </button>
           )}
         </div>
-        <div className="flex-1 overflow-hidden relative flex items-start justify-center bg-[#040404] p-4">
-          <div
-            className="w-full rounded-2xl overflow-hidden border border-white/8 shadow-2xl bg-black"
-            style={{ zoom: isPhotographerStream ? 0.48 : 0.55, transformOrigin: "top center", width: "100%", minWidth: 390, height: 844 }}
-          >
-            {TemplatePreview ? <TemplatePreview data={localData} /> : null}
+        <div className="flex-1 min-h-0 overflow-hidden bg-[#040404] p-3">
+          <div className="w-full h-full rounded-xl border border-white/8 shadow-2xl bg-black overflow-hidden relative">
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '900px',
+              height: '1800px',
+              transform: 'scale(0.424)',
+              transformOrigin: 'top left',
+              pointerEvents: 'none',
+            }}>
+              {TemplatePreview ? <TemplatePreview data={localData} /> : null}
+            </div>
           </div>
         </div>
         {isPhotographerStream && (
-          <div className="p-3 border-t border-white/5 text-center">
+          <div className="h-8 shrink-0 border-t border-white/5 flex items-center justify-center">
             <p className="text-[9px] text-gray-700 uppercase tracking-widest">Cinematic · Luxury · Immersive</p>
           </div>
         )}

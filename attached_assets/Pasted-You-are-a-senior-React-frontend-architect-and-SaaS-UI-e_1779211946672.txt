@@ -1,0 +1,199 @@
+You are a senior React frontend architect and SaaS UI engineer.
+
+Fix the dashboard layout and responsive architecture issues in my existing CodeFolio project.
+
+IMPORTANT:
+This is an already working application.
+
+DO NOT:
+
+* redesign the whole app
+* rebuild the dashboard
+* break authentication
+* change backend APIs
+* remove streams/templates
+
+ONLY fix:
+
+* broken layout structure
+* responsiveness
+* sidebar/content sizing
+* overflow issues
+* stream switching layout bugs
+
+====================================================
+CURRENT PROBLEM
+===============
+
+After switching streams (Developer / Graphic Designer / Photographer):
+
+* dashboard layout breaks
+* content overlaps
+* sidebar sizing becomes inconsistent
+* main content gets squeezed
+* photographer stream UI overflows
+* live preview positioning breaks
+* sections become misaligned
+* responsive behavior fails
+
+The app currently looks structurally broken after stream switching.
+
+====================================================
+MAIN GOAL
+=========
+
+Create a STABLE RESPONSIVE DASHBOARD LAYOUT SYSTEM that works correctly for ALL streams.
+
+====================================================
+FIX THE LAYOUT ARCHITECTURE
+===========================
+
+Replace unstable layout sizing with a proper responsive structure.
+
+Use:
+
+* CSS Grid OR Flexbox properly
+* minmax()
+* flex-shrink rules
+* overflow handling
+* responsive containers
+
+====================================================
+REQUIRED DASHBOARD STRUCTURE
+============================
+
+Use this layout:
+
+---
+
+## LEFT SIDEBAR
+
+Fixed sidebar width:
+
+* desktop: 280px
+* tablet: 240px
+* mobile: collapsible drawer
+
+Sidebar should:
+
+* never overlap content
+* never resize unexpectedly
+* remain scrollable independently
+
+---
+
+## MAIN CONTENT AREA
+
+The main dashboard content should:
+
+* take remaining width
+* support scrolling
+* never overflow horizontally
+* adapt to different stream forms
+
+Use:
+
+* max-width containers
+* proper padding
+* responsive spacing
+
+---
+
+## LIVE PREVIEW PANEL
+
+Preview panel should:
+
+* have independent width
+* scale properly
+* never squash forms
+* never overflow screen
+
+Desktop:
+
+* right-side preview panel
+
+Tablet:
+
+* smaller preview
+
+Mobile:
+
+* move preview below forms
+
+====================================================
+IMPORTANT FIXES
+===============
+
+1. Remove broken fixed widths.
+2. Remove overflow hidden issues.
+3. Prevent horizontal scrolling.
+4. Fix nested flexbox sizing.
+5. Add min-width: 0 where needed.
+6. Add responsive breakpoints.
+7. Fix stream-switch rendering issues.
+8. Prevent content overlap.
+9. Improve spacing consistency.
+10. Fix photographer gallery layout responsiveness.
+
+====================================================
+RESPONSIVE BREAKPOINTS
+======================
+
+Desktop:
+1200px+
+
+Tablet:
+768px – 1199px
+
+Mobile:
+below 768px
+
+====================================================
+CSS FIXES
+=========
+
+Ensure:
+
+* box-sizing: border-box
+* proper flex growth
+* overflow-y handling
+* no container clipping
+* responsive typography
+* scalable preview sizes
+
+====================================================
+STREAM COMPATIBILITY
+====================
+
+Ensure layout works properly for:
+
+* Developer stream
+* Graphic Designer stream
+* Photographer stream
+
+Each stream has different content sizes.
+
+The dashboard must dynamically adapt WITHOUT breaking.
+
+====================================================
+FINAL GOAL
+==========
+
+The dashboard should feel:
+
+* stable
+* modern
+* professional
+* responsive
+* polished
+* production-ready
+
+It should work smoothly like:
+
+* Framer dashboard
+* Webflow editor
+* Canva editor
+* modern SaaS CMS platforms
+
+Most importantly:
+NO broken layouts after stream switching.
